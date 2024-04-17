@@ -48,6 +48,8 @@ def test_format_duration(duration: timedelta, expected: str):
         (date(year=2022, month=2, day=22), date(year=2022, month=2, day=22)),
         ('today', date.today()),
         ('yesterday', date.today() - timedelta(days=1)),
+        ('y', date.today() - timedelta(days=1)),
+        ('Y', date.today() - timedelta(days=1)),
     ],
 )
 def test_parse_date(given, expected):
