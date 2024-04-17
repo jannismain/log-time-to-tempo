@@ -71,11 +71,11 @@ lt config --unset
 
 ## Changes
 
-### [latest] - 2024-XX-XX
-[latest]: https://gitlab.codecentric.de/jmm/log-time-to-tempo/-/blob/main/README.md
+### [latest]
+[latest]: https://github.com/jannismain/log-time-to-tempo/commits/main/
 
 ### [0.0.2] - 2024-04-17
-[0.0.2]: https://gitlab.codecentric.de/jmm/log-time-to-tempo/-/blob/0.0.2/README.md
+[0.0.2]: https://github.com/jannismain/log-time-to-tempo/releases/tag/v0.0.2
 
 - add `log --lunch` option to reduce the amount of math you have to do in your head when entering your time
   - lunch will simply be deducted from the total duration and your end time
@@ -84,7 +84,7 @@ lt config --unset
 - add `--version` flag
 
 ### [0.0.1] - 2024-03-25
-[0.0.1]: https://gitlab.codecentric.de/jmm/log-time-to-tempo/-/blob/0.0.1/README.md
+[0.0.1]: https://github.com/jannismain/log-time-to-tempo/releases/tag/v0.0.1
 
 - authorize with JIRA instance using personal access token
   - prompt for token and persist using [`keyring`][python-keyring] package
