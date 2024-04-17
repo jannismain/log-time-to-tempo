@@ -27,7 +27,7 @@ class ConfigOption(StrEnum):
     JIRA_INSTANCE = auto()
     # log command
     LT_LOG_ISSUE = auto()
-    LT_LOG_FROM_TIME = auto()
+    LT_LOG_START = auto()
     LT_LOG_MESSAGE = auto()
     LT_LOG_DURATION = auto()
 

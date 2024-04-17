@@ -63,7 +63,7 @@ lt config --system JIRA_INSTANCE https://jira.my-server.com
 lt config LT_LOG_ISSUE TSI-7
 
 # Start all your worklogs at 10am (instead of the default 9am)
-lt config --system LT_LOG_FROM_TIME 10
+lt config --system LT_LOG_START 10
 
 # Remove all custom configuration
 lt config --unset
