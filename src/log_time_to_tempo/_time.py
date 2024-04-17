@@ -66,6 +66,8 @@ def parse_date_dot(value: str) -> date:
 
 
 def parse_past_weekday_relative(value: str) -> date:
+    original_value = value
+    value = value.lower()
     if value == 'today':
         return date.today()
     elif value in {'yesterday', 'y'}:
@@ -81,7 +83,7 @@ def parse_past_weekday_relative(value: str) -> date:
     elif value in {'friday', 'fri', 'fr', 'f', 'freitag'}:
         day = FRIDAY
     else:
-        raise ValueError(f'Unknown relative date: {value}')
+        raise ValueError(f'Unknown relative date: {original_value}')
     # if day is in the future, assume last week
     if day > date.today().weekday():
         return date.today() - timedelta(weeks=1, days=date.today().weekday() - day)

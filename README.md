@@ -74,6 +74,11 @@ lt config --unset
 ### [latest] - 2024-XX-XX
 [latest]: https://gitlab.codecentric.de/jmm/log-time-to-tempo/-/blob/main/README.md
 
+- `log --day` is now case-insensitive (so `Mo` will be recognized as `monday`)
+
+### [0.0.1] - 2024-03-25
+[latest]: https://gitlab.codecentric.de/jmm/log-time-to-tempo/-/blob/0.0.1/README.md
+
 - authorize with JIRA instance using personal access token
   - prompt for token and persist using [`keyring`][python-keyring] package
 - create and list worklogs via tempo's REST API
