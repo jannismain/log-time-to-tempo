@@ -56,10 +56,12 @@ path = "src/log_time_to_tempo/__init__.py"
 dependencies = ["ruff"]
 [tool.hatch.envs.default.scripts]
 test = "hatch run test:test"
+release = "hatch run test:release"
 
 [tool.hatch.envs.test]
 dependencies = ["pytest", "pytest-cov", "hypothesis"]
-scripts = { "test" = "pytest --cov-config=pyproject.toml --cov-report=term --cov-report html:build/coverage --cov=log_time_to_tempo --cov-report xml" }
+[tool.hatch.envs.test.scripts]
+test = "pytest --cov-config=pyproject.toml --cov-report=term --cov-report html:build/coverage --cov=log_time_to_tempo --cov-report xml"
 release = """\
 hatch run test:test
 git tag -m 'bump version to '`hatch version` v`hatch version` --sign
@@ -69,8 +71,12 @@ sleep 5
 hatch build --clean
 hatch publish
 glab release create v`hatch version` \
-    --title `hatch version` \
-    --notes '*[see changes](https://gitlab.codecentric.de/jmm/log_time_to_tempo/blob/main/README.md#'`hatch version | tr -d .`'---'`date -Idate`')*'\
+    --name v`hatch version` \
+    --notes '*[see changes](https://gitlab.codecentric.de/jmm/log-time-to-tempo/-/blob/main/README.md#'`hatch version | tr -d .`'-'`date -Idate`')*' \
+    dist/*
+gh release create v`hatch version` \
+    --title v`hatch version` \
+    --notes '*[see changes](https://github.com/jannismain/log-time-to-tempo/blob/main/README.md#'`hatch version | tr -d .`'---'`date -Idate`')*' \
     dist/*
 """
 
