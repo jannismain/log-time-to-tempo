@@ -74,6 +74,8 @@ lt config --unset
 ### [latest] - 2024-XX-XX
 [latest]: https://gitlab.codecentric.de/jmm/log-time-to-tempo/-/blob/main/README.md
 
+- add `log --lunch` option to reduce the amount of math you have to do in your head when entering your time
+  - lunch will simply be deducted from the total duration and your end time
 - rename `log --from-time '' --to-time ''` options to `log --start '' --end ''`
 - `log --day` is now case-insensitive (so `Mo` will be recognized as `monday`)
 

@@ -124,6 +124,7 @@ def log_time(
     ] = datetime.now().date(),
     start: Annotated[time, typer.Option(parser=_time.parse_time, show_default='9')] = None,
     end: Annotated[time, typer.Option(parser=_time.parse_time)] = None,
+    lunch: Annotated[timedelta, typer.Option(parser=_time.parse_duration)] = None,
     message: Annotated[str, typer.Option('--message', '-m')] = None,
     yes: Annotated[bool, typer.Option('--yes', '-y', help='log time without confirmation')] = False,
 ):
@@ -141,6 +142,14 @@ def log_time(
         start = (last_worklog.started + timedelta(seconds=last_worklog.timeSpentSeconds)).time()
     elif start is None:
         start = _time.parse_time(os.getenv('LT_LOG_START', '9'))
+    started = datetime.combine(day, start)
+    if end is not None:
+        duration = datetime.combine(day, end) - started
+    if end is None:
+        end = (started + duration).time()
+    if lunch:
+        duration -= lunch
+        end = (datetime.combine(day, end) - lunch).time()
 
     rich.print(
         'Log',
