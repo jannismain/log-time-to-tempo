@@ -122,8 +122,8 @@ def log_time(
     day: Annotated[
         date, typer.Option(parser=_time.parse_date, show_envvar=False, show_default='today')
     ] = datetime.now().date(),
-    from_time: Annotated[time, typer.Option(parser=_time.parse_time, show_default='9')] = None,
-    to_time: Annotated[time, typer.Option(parser=_time.parse_time)] = None,
+    start: Annotated[time, typer.Option(parser=_time.parse_time, show_default='9')] = None,
+    end: Annotated[time, typer.Option(parser=_time.parse_time)] = None,
     message: Annotated[str, typer.Option('--message', '-m')] = None,
     yes: Annotated[bool, typer.Option('--yes', '-y', help='log time without confirmation')] = False,
 ):
@@ -136,22 +136,16 @@ def log_time(
     worklogs = tempo.get_worklogs(ctx.obj.myself['key'], day, day)
     seconds_logged = sum(worklog.timeSpentSeconds for worklog in worklogs)
     duration_logged = timedelta(seconds=seconds_logged)
-    if worklogs and from_time is None:
+    if worklogs and start is None:
         last_worklog = worklogs[-1]
-        from_time = (last_worklog.started + timedelta(seconds=last_worklog.timeSpentSeconds)).time()
-    elif from_time is None:
-        from_time = _time.parse_time(os.getenv('LT_LOG_FROM_TIME', '9'))
-
-    started = datetime.combine(day, from_time)
-    if to_time is not None:
-        duration = datetime.combine(day, to_time) - started
-    else:
-        to_time = (started + duration).time()
+        start = (last_worklog.started + timedelta(seconds=last_worklog.timeSpentSeconds)).time()
+    elif start is None:
+        start = _time.parse_time(os.getenv('LT_LOG_START', '9'))
 
     rich.print(
         'Log',
         _time.format_duration(duration),
-        f'({from_time.strftime('%H:%M')} - {to_time.strftime('%H:%M')})',
+        f'({start.strftime('%H:%M')} - {end.strftime('%H:%M')})',
         f'as [italic]{cfg.issue.fields.summary} ({cfg.issue.key})[/italic]',
         f'for {_time.format_date_relative(day)}',
     )

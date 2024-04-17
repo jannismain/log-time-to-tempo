@@ -74,6 +74,7 @@ lt config --unset
 ### [latest] - 2024-XX-XX
 [latest]: https://gitlab.codecentric.de/jmm/log-time-to-tempo/-/blob/main/README.md
 
+- rename `log --from-time '' --to-time ''` options to `log --start '' --end ''`
 - `log --day` is now case-insensitive (so `Mo` will be recognized as `monday`)
 
 ### [0.0.1] - 2024-03-25
