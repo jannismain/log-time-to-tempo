@@ -74,13 +74,17 @@ lt config --unset
 ### [latest] - 2024-XX-XX
 [latest]: https://gitlab.codecentric.de/jmm/log-time-to-tempo/-/blob/main/README.md
 
+### [0.0.2] - 2024-04-17
+[0.0.2]: https://gitlab.codecentric.de/jmm/log-time-to-tempo/-/blob/0.0.2/README.md
+
 - add `log --lunch` option to reduce the amount of math you have to do in your head when entering your time
   - lunch will simply be deducted from the total duration and your end time
 - rename `log --from-time '' --to-time ''` options to `log --start '' --end ''`
 - `log --day` is now case-insensitive (so `Mo` will be recognized as `monday`)
+- add `--version` flag
 
 ### [0.0.1] - 2024-03-25
-[latest]: https://gitlab.codecentric.de/jmm/log-time-to-tempo/-/blob/0.0.1/README.md
+[0.0.1]: https://gitlab.codecentric.de/jmm/log-time-to-tempo/-/blob/0.0.1/README.md
 
 - authorize with JIRA instance using personal access token
   - prompt for token and persist using [`keyring`][python-keyring] package

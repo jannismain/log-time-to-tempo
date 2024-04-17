@@ -1,6 +1,9 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "log-time-to-tempo"
-version = "0.0.1"
 description = 'Log your work time to tempo from the command line.'
 readme = "README.md"
 requires-python = ">=3.8"
@@ -8,6 +11,7 @@ keywords = ["jira", "tempo", "cli"]
 authors = [
   { name = "Jannis Mainczyk", email = "jannis.mainczyk@codecentric.de" },
 ]
+dynamic = ["version"]
 dependencies = [
   "jira",
   "typer[all]",
@@ -44,6 +48,9 @@ Source = "https://github.com/jannismain/log-time-to-tempo"
 [project.scripts]
 log-time = "log_time_to_tempo.cli.main:app"
 lt = "log_time_to_tempo.cli.main:app"
+
+[tool.hatch.version]
+path = "src/log_time_to_tempo/__init__.py"
 
 [tool.hatch.envs.default]
 dependencies = ["ruff"]

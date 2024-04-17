@@ -10,18 +10,13 @@ from keyring.errors import PasswordDeleteError
 from rich.table import Table
 from typing_extensions import Annotated
 
-from .. import _jira, _time, caching, cfg, name, tempo
+from .. import __version__, _jira, _time, caching, cfg, name, tempo
 from .._logging import log
 from . import app, config, error, link
 from .completions import complete_issue, complete_project
 
 token_found_in_environment = os.getenv('JIRA_API_TOKEN')
 config.load()
-
-
-def cb_duration(ctx: typer.Context, value: str) -> timedelta:
-    if value:
-        return _time.parse_duration(value)
 
 
 @app.callback(
@@ -45,6 +40,9 @@ def main(
     ] = 0,
     persist_token: Annotated[bool, typer.Option(hidden=True)] = True,
     cache: Annotated[bool, typer.Option(hidden=True)] = True,
+    version: Annotated[
+        bool, typer.Option('--version', callback=lambda v: print(__version__) if v else None)
+    ] = False,
 ):
     """Log time to tempo."""
     if ctx.resilient_parsing:  # script is running for completion purposes, nocov
