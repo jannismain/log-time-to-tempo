@@ -14,7 +14,7 @@ authors = [
 dynamic = ["version"]
 dependencies = [
   "jira",
-  "typer[all]",
+  "typer",
   "rich",
   "python-dotenv",
   "keyring",
