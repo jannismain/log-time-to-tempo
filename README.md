@@ -74,6 +74,9 @@ lt config --unset
 ### [latest]
 [latest]: https://github.com/jannismain/log-time-to-tempo/commits/main/
 
+- add `lt stats` command to aggregate spent time per issue
+- fix issue with formatted durations, where days would not be accounted for
+
 ### [0.0.2] - 2024-04-17
 [0.0.2]: https://github.com/jannismain/log-time-to-tempo/releases/tag/v0.0.2
 

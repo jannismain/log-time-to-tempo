@@ -60,7 +60,7 @@ def main(
             log_config['level_styles'] = dict(info=dict(faint=True))
 
         coloredlogs.install(**log_config)
-        ctx.obj.verbose = verbose
+    ctx.obj.verbose = verbose
 
     # return early for subcommands that don't interact with jira
     if ctx.invoked_subcommand not in 'log issues list projects init *'.split():
@@ -193,6 +193,68 @@ def cmd_list(
         typer.echo(
             f'{worklog.started.strftime("%d.%m %H:%M")}: {worklog.timeSpent} - {worklog.issue.summary} ({worklog.issue.key}) - {worklog.comment}'
         )
+
+
+@app.command('stats', rich_help_panel='GET')
+def cmd_stats(
+    ctx: typer.Context,
+    date_range: Annotated[_time.RelativeDateRange, typer.Argument()] = 'this_week',
+    from_date: Annotated[date, typer.Option('--from', parser=_time.parse_date)] = None,
+    to_date: Annotated[
+        date, typer.Option('--to', parser=_time.parse_date, show_default='today')
+    ] = datetime.now().date().strftime('%d.%m'),
+    verbose: Annotated[int, typer.Option('-v', count=True)] = 0,
+):
+    """Show logged time per project.
+
+    For a custom time range, use the --from and --to options:
+
+    $ lt list --from 1.12 --to 24.12
+    """
+    typer.secho(
+        f"Period: {date_range.value if from_date is None else f'{from_date} - {to_date}'}",
+        bold=True,
+    )
+    if from_date is None:
+        from_date, to_date = _time.parse_relative_date_range(date_range)
+    stats = {}
+    for worklog in tempo.get_worklogs(ctx.obj.myself['key'], from_date, to_date):
+        project = get_project_description(ctx, worklog.issue)
+        if project not in stats:
+            stats[project] = {
+                'timeSpentSeconds': 0,
+                'summary': worklog.issue.summary,
+                'worklogs': [],
+                'days': {},
+            }
+        stats[project]['timeSpentSeconds'] = (
+            stats[project]['timeSpentSeconds'] + worklog.timeSpentSeconds
+        )
+        stats[project]['worklogs'].append(worklog)
+        if (date := worklog.started.strftime('%d.%m')) not in stats[project]['days']:
+            stats[project]['days'][date] = {
+                'comments': set([worklog.comment]),
+                'timeSpentSeconds': worklog.timeSpentSeconds,
+            }
+        else:
+            stats[project]['days'][date]['comments'].add(worklog.comment)
+            stats[project]['days'][date]['timeSpentSeconds'] += worklog.timeSpentSeconds
+
+    for project in sorted(stats, key=lambda k: stats[k]['timeSpentSeconds'], reverse=True):
+        total_duration = _time.format_duration_aligned(
+            timedelta(seconds=stats[project]['timeSpentSeconds'])
+        )
+        typer.echo(f'{typer.style(total_duration, bold=True)}  {project}')
+        if ctx.obj.verbose > 0 or verbose > 0:
+            for date, daily_stats in stats[project]['days'].items():
+                typer.echo(
+                    f'          {date}: {_time.format_duration_aligned(timedelta(seconds=daily_stats['timeSpentSeconds']))} - {", ".join(daily_stats['comments'])}'
+                )
+    typer.secho('-' * 20)
+    total_duration = _time.format_duration_aligned(
+        timedelta(seconds=sum(project['timeSpentSeconds'] for project in stats.values()))
+    )
+    typer.secho(f'{total_duration}  Total', bold=True)
 
 
 @app.command(rich_help_panel='GET')

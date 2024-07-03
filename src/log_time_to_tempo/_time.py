@@ -6,7 +6,7 @@ from pathlib import Path
 from calendar import MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY  # isort: skip (keep weekdays in order)
 
 
-def parse_duration(s):
+def parse_duration(s: str) -> timedelta:
     try:
         return parse_duration_float(s)
     except ValueError:
@@ -112,10 +112,20 @@ def modified_within(f: Path, **kwargs) -> bool:
     return f.stat().st_mtime > (datetime.now() - timedelta(**kwargs)).timestamp()
 
 
-def format_duration(duration: timedelta) -> str:
-    hours, remainder = divmod(duration.seconds, 3600)
+def _duration_to_hours_and_minutes(duration: timedelta) -> tuple[int, int]:
+    hours, remainder = divmod(int(duration.total_seconds()), 60 * 60)
     minutes, _ = divmod(remainder, 60)
+    return hours, minutes
+
+
+def format_duration(duration: timedelta) -> str:
+    hours, minutes = _duration_to_hours_and_minutes(duration)
     return f'{hours}h{f" {minutes}m" if minutes else ""}'
+
+
+def format_duration_aligned(duration: timedelta, max_hour_digits=3) -> str:
+    hours, minutes = _duration_to_hours_and_minutes(duration)
+    return f'{hours:{max_hour_digits}d}h{f" {minutes}m" if minutes else "    "}'
 
 
 class RelativeDateRange(str, Enum):
