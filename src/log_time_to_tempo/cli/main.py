@@ -12,7 +12,7 @@ from typing_extensions import Annotated
 
 from .. import __version__, _jira, _time, caching, cfg, name, tempo
 from .._logging import log
-from . import app, config, error, link
+from . import alias, app, config, error, link
 from .completions import complete_issue, complete_project
 
 token_found_in_environment = os.getenv('JIRA_API_TOKEN')
@@ -61,6 +61,7 @@ def main(
 
         coloredlogs.install(**log_config)
     ctx.obj.verbose = verbose
+    ctx.obj.aliases = alias._read_aliases()
 
     # return early for subcommands that don't interact with jira
     if ctx.invoked_subcommand not in 'log issues list projects init *'.split():
@@ -191,7 +192,7 @@ def cmd_list(
         from_date, to_date = _time.parse_relative_date_range(date_range)
     for worklog in tempo.get_worklogs(ctx.obj.myself['key'], from_date, to_date):
         typer.echo(
-            f'{worklog.started.strftime("%d.%m %H:%M")}: {worklog.timeSpent} - {worklog.issue.summary} ({worklog.issue.key}) - {worklog.comment}'
+            f'{worklog.started.strftime("%d.%m %H:%M")}  {_time.format_duration_aligned(timedelta(seconds=worklog.timeSpentSeconds), 2)}  {get_project_description(ctx, worklog.issue)} ({worklog.issue.key}) - {worklog.comment}'
         )
 
 
@@ -346,6 +347,10 @@ def init(
         typer.echo('project cache updated.')
         _jira.get_all_issues(ctx.obj.jira, update_cache=True)
         typer.echo('issue cache updated.')
+
+
+def get_project_description(ctx, issue):
+    return ctx.obj.aliases.get(issue.key) or f'{issue.summary}'
 
 
 if __name__ == '__main__':
