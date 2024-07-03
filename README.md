@@ -75,6 +75,10 @@ lt config --unset
 [latest]: https://github.com/jannismain/log-time-to-tempo/commits/main/
 
 - add `lt stats` command to aggregate spent time per issue
+- renamed relative date ranges
+  - `week_to_date` → `this_week`
+  - `month_to_date` → `this_month`
+  - `year` → `this_year`
 - fix issue with formatted durations, where days would not be accounted for
 
 ### [0.0.2] - 2024-04-17
