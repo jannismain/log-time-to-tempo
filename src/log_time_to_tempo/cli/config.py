@@ -2,7 +2,6 @@ import pathlib
 from enum import StrEnum, auto
 from typing import Annotated
 
-import click
 import dotenv
 import rich
 import typer
@@ -10,10 +9,10 @@ from dotenv import dotenv_values, find_dotenv, load_dotenv
 
 from .. import name
 from .._logging import log
-from . import app, link
+from . import app, app_dir, link
 
 filename = f'.{name}'
-fp_config_default = pathlib.Path(click.get_app_dir(name)) / filename
+fp_config_default = app_dir / filename
 
 
 class ConfigOption(StrEnum):
