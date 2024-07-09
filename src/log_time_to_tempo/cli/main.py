@@ -131,7 +131,12 @@ def log_time(
     if ctx.resilient_parsing:  # script is running for completion purposes
         return
     cfg = ctx.obj
+
+    if issue in ctx.obj.aliases.values():
+        issue = next(k for k, v in ctx.obj.aliases.items() if v == issue)
+
     cfg.issue = cfg.jira.issue(issue, fields='summary,comment')
+    description = get_project_description(ctx, cfg.issue)
 
     worklogs = tempo.get_worklogs(ctx.obj.myself['key'], day, day)
     seconds_logged = sum(worklog.timeSpentSeconds for worklog in worklogs)
@@ -154,7 +159,7 @@ def log_time(
         'Log',
         _time.format_duration(duration),
         f'({start.strftime('%H:%M')} - {end.strftime('%H:%M')})',
-        f'as [italic]{cfg.issue.fields.summary} ({cfg.issue.key})[/italic]',
+        f'as [italic]{cfg.issue.fields.summary} ({description})[/italic]',
         f'for {_time.format_date_relative(day)}',
     )
 
