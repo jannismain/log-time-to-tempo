@@ -355,7 +355,11 @@ def init(
 
 
 def get_project_description(ctx, issue):
-    return ctx.obj.aliases.get(issue.key) or f'{issue.summary}'
+    if alias := ctx.obj.aliases.get(issue.key):
+        return alias
+    if isinstance(issue, jira.Issue):
+        return issue.key
+    return issue.summary
 
 
 if __name__ == '__main__':
