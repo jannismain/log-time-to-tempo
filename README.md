@@ -75,6 +75,8 @@ lt config --unset
 [latest]: https://github.com/jannismain/log-time-to-tempo/commits/main/
 
 - add `lt stats` command to aggregate spent time per issue
+- add `lt alias` command to provide more meaningful aliases for issue descriptions
+  - `lt alias --unset` to remove previously set aliases
 - renamed relative date ranges
   - `week_to_date` → `this_week`
   - `month_to_date` → `this_month`
