@@ -204,7 +204,7 @@ def cmd_list(
 @app.command('stats', rich_help_panel='GET')
 def cmd_stats(
     ctx: typer.Context,
-    date_range: Annotated[_time.RelativeDateRange, typer.Argument()] = 'this_week',
+    date_range: Annotated[_time.RelativeDateRange, typer.Argument()] = 'week',
     from_date: Annotated[date, typer.Option('--from', parser=_time.parse_date)] = None,
     to_date: Annotated[
         date, typer.Option('--to', parser=_time.parse_date, show_default='today')

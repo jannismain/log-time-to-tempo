@@ -78,9 +78,10 @@ lt config --unset
 - add `lt alias` command to provide more meaningful aliases for issue descriptions
   - `lt alias --unset` to remove previously set aliases
 - renamed relative date ranges
-  - `week_to_date` → `this_week`
-  - `month_to_date` → `this_month`
-  - `year` → `this_year`
+  - `week` → `last_7_days`
+  - `month` → `last_30_days`
+  - `week_to_date` → `week`
+  - `month_to_date` → `month`
 - fix issue with formatted durations, where days would not be accounted for
 
 ### [0.0.2] - 2024-04-17

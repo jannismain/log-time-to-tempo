@@ -113,25 +113,25 @@ def test_parse_relative_date_range():
         assert start == end
 
     # week-based ranges
-    for rng in [_time.RelativeDateRange.LAST_WEEK, _time.RelativeDateRange.THIS_WEEK]:
+    for rng in [_time.RelativeDateRange.LAST_WEEK, _time.RelativeDateRange.WEEK]:
         start, end = _time.parse_relative_date_range(rng)
         assert end - start < timedelta(days=7), 'should never exceed a week'
         assert start.weekday() == 0, 'week should start on a Monday'
 
-    start, end = _time.parse_relative_date_range(_time.RelativeDateRange.THIS_WEEK)
+    start, end = _time.parse_relative_date_range(_time.RelativeDateRange.WEEK)
     assert start == _time.last_monday(), 'week to date should start with last monday'
 
     start, end = _time.parse_relative_date_range(_time.RelativeDateRange.LAST_WEEK)
     assert start == _time.last_monday(date.today()) - timedelta(weeks=1), 'should start with Monday'
 
     # month-based ranges
-    for rng in [_time.RelativeDateRange.LAST_MONTH, _time.RelativeDateRange.THIS_MONTH]:
+    for rng in [_time.RelativeDateRange.LAST_MONTH, _time.RelativeDateRange.MONTH]:
         start, end = _time.parse_relative_date_range(rng)
         assert end - start < timedelta(days=31), 'should never exceed a month'
         assert start.day == 1, 'month should start on the 1st'
 
     # year-based ranges
-    for rng in [_time.RelativeDateRange.LAST_YEAR, _time.RelativeDateRange.THIS_YEAR]:
+    for rng in [_time.RelativeDateRange.LAST_YEAR, _time.RelativeDateRange.YEAR]:
         start, end = _time.parse_relative_date_range(rng)
         assert end - start < timedelta(days=366), 'should never exceed a year'
         assert start.day == 1 and start.month == 1, 'year should start on 1st of January'
@@ -142,9 +142,9 @@ def test_parse_relative_date_range():
     # ranges that end with today
     for rng in [
         _time.RelativeDateRange.TODAY,
-        _time.RelativeDateRange.THIS_WEEK,
-        _time.RelativeDateRange.THIS_MONTH,
-        _time.RelativeDateRange.THIS_YEAR,
+        _time.RelativeDateRange.WEEK,
+        _time.RelativeDateRange.MONTH,
+        _time.RelativeDateRange.YEAR,
     ]:
         start, end = _time.parse_relative_date_range(rng)
         assert end == date.today(), 'x to date should end with today'

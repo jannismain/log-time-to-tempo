@@ -130,11 +130,11 @@ def format_duration_aligned(duration: timedelta, max_hour_digits=3) -> str:
 
 class RelativeDateRange(str, Enum):
     TODAY = 'today'
+    LAST_SEVEN_DAYS = 'last_7_days'
     WEEK = 'week'
-    THIS_WEEK = 'this_week'
+    LAST_30_DAYS = 'last_30_days'
     MONTH = 'month'
-    THIS_MONTH = 'this_month'
-    THIS_YEAR = 'this_year'
+    YEAR = 'year'
     YESTERDAY = 'yesterday'
     LAST_WEEK = 'last_week'
     LAST_MONTH = 'last_month'
@@ -148,23 +148,23 @@ def parse_relative_date_range(v: RelativeDateRange) -> tuple[date, date]:
     elif v == RelativeDateRange.YESTERDAY:
         yesterday = today - timedelta(days=1)
         return yesterday, yesterday
-    elif v == RelativeDateRange.WEEK:
+    elif v == RelativeDateRange.LAST_SEVEN_DAYS:
         return today - timedelta(weeks=1), today
-    elif v == RelativeDateRange.THIS_WEEK:
+    elif v == RelativeDateRange.WEEK:
         return last_monday(), today
     elif v == RelativeDateRange.LAST_WEEK:
         monday_last_week = last_monday() - timedelta(weeks=1)
         return monday_last_week, monday_last_week + timedelta(days=6)
-    elif v == RelativeDateRange.MONTH:
+    elif v == RelativeDateRange.LAST_30_DAYS:
         return today - timedelta(days=30), today
-    elif v == RelativeDateRange.THIS_MONTH:
+    elif v == RelativeDateRange.MONTH:
         first_day_of_this_month = today.replace(day=1)
         return first_day_of_this_month, today
     elif v == RelativeDateRange.LAST_MONTH:
         last_day_of_last_month = today.replace(day=1) - timedelta(days=1)
         first_day_of_last_month = last_day_of_last_month.replace(day=1)
         return first_day_of_last_month, last_day_of_last_month
-    elif v == RelativeDateRange.THIS_YEAR:
+    elif v == RelativeDateRange.YEAR:
         first_day_of_year = today.replace(month=1, day=1)
         return first_day_of_year, today
     elif v == RelativeDateRange.LAST_YEAR:
