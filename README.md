@@ -39,6 +39,8 @@ lt --install-completion
 
 ## Usage
 
+### Log Time
+
 ```sh
 # log full workday to default issue
 lt log
@@ -46,6 +48,19 @@ lt log
 lt log 2h
 # log 2h to specific issue
 lt log 2h TSI-1
+# log with custom message
+lt log -m "working on foo" 2h TSI-1
+```
+
+### Check Logged Time
+
+```sh
+# show logged time per issue
+lt stats
+# show logged time per issue for current month
+lt stats month
+# ..also show individual worklogs
+lt stats -v
 ```
 
 ## Configuration
