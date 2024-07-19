@@ -4,6 +4,7 @@ from enum import Enum
 from pathlib import Path
 
 from calendar import MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY  # isort: skip (keep weekdays in order)
+import dateparser
 
 
 def parse_duration(s: str) -> timedelta:
@@ -53,7 +54,10 @@ def parse_date(value: str | date) -> date:
     if '.' in value:
         return parse_date_dot(value)
     else:
-        return parse_past_weekday_relative(value)
+        try:
+            return parse_past_weekday_relative(value)
+        except ValueError:
+            return dateparser.parse(value).date()
 
 
 def parse_date_dot(value: str) -> date:

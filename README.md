@@ -83,6 +83,7 @@ lt config --unset
   - `week_to_date` → `week`
   - `month_to_date` → `month`
 - fix issue with formatted durations, where days would not be accounted for
+- parse more relative dates (e.g. "3 weeks ago") (using [`dateparser.parse`][dateparser.parse])
 
 ### [0.0.2] - 2024-04-17
 [0.0.2]: https://github.com/jannismain/log-time-to-tempo/releases/tag/v0.0.2
@@ -104,3 +105,4 @@ lt config --unset
 
 [python-jira]: https://github.com/pycontribs/jira
 [python-keyring]: https://pypi.org/project/keyring/
+[dateparser.parse]: https://dateparser.readthedocs.io/en/latest/#popular-formats

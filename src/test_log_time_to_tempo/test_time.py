@@ -50,6 +50,7 @@ def test_format_duration(duration: timedelta, expected: str):
         ('yesterday', date.today() - timedelta(days=1)),
         ('y', date.today() - timedelta(days=1)),
         ('Y', date.today() - timedelta(days=1)),
+        ('3 weeks ago', date.today() - timedelta(days=21)),
     ],
 )
 def test_parse_date(given, expected):

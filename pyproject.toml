@@ -23,6 +23,7 @@ dependencies = [
   "pydantic",
   "python-dateutil",
   "simple-term-menu", # https://github.com/IngoMeyer441/simple-term-menu
+  "dateparser",
 ]
 classifiers = [
   "Development Status :: 4 - Beta",
