@@ -7,6 +7,7 @@ import jira
 import keyring
 import rich
 import typer
+from click.shell_completion import CompletionItem
 from keyring.errors import PasswordDeleteError
 from rich.table import Table
 from typing_extensions import Annotated
@@ -21,10 +22,10 @@ config.load()
 
 arg_relative_date_range = typer.Argument(
     callback=lambda x: _time.resolve_relative_date_range(x),
-    autocompletion=lambda incomplete: list(
-        (
+    shell_complete=lambda ctx, param, incomplete: list(
+        CompletionItem(
             v,
-            f'short: {", ".join(_time.relative_date_range_abbreviations.get(v))}'
+            help=f'short: {", ".join(_time.relative_date_range_abbreviations.get(v))}'
             if v in _time.relative_date_range_abbreviations
             else '',
         )
