@@ -13,6 +13,13 @@ def fp_test_config(monkeypatch, tmp_path):
     yield fp_test_config
 
 
+def test_ensure_app_dir_exists(monkeypatch, tmp_path):
+    fp_test_config = tmp_path / '.config' / 'lt' / config.filename
+    monkeypatch.setattr('log_time_to_tempo.cli.config.fp_config_default', fp_test_config)
+
+    config.ensure_app_dir_exists()  # should not raise exception when parent dir does not exist
+
+
 def test_load_config(fp_test_config):
     config.ensure_app_dir_exists()
     assert os.getenv('canary') is None, 'environment variable should not exist'

@@ -32,7 +32,7 @@ class ConfigOption(StrEnum):
 
 
 def ensure_app_dir_exists():
-    fp_config_default.parent.mkdir(exist_ok=True)
+    fp_config_default.parent.mkdir(exist_ok=True, parents=True)
 
 
 def load_local_config():
