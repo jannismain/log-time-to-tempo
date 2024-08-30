@@ -145,8 +145,30 @@ class RelativeDateRange(str, Enum):
     LAST_YEAR = 'last_year'
 
 
-def parse_relative_date_range(v: RelativeDateRange) -> tuple[date, date]:
+relative_date_range_abbreviations = {
+    RelativeDateRange.TODAY: {'day', 'd'},
+    RelativeDateRange.LAST_SEVEN_DAYS: {'l7'},
+    RelativeDateRange.WEEK: {'w'},
+    RelativeDateRange.LAST_30_DAYS: {'l30'},
+    RelativeDateRange.MONTH: {'m'},
+    RelativeDateRange.YESTERDAY: {'y'},
+    RelativeDateRange.LAST_WEEK: {'lw'},
+    RelativeDateRange.LAST_MONTH: {'lm'},
+    RelativeDateRange.LAST_YEAR: {'ly'},
+}
+
+
+def resolve_relative_date_range(v: str) -> RelativeDateRange:
+    if any(v in syn for syn in relative_date_range_abbreviations.values()):
+        v = next(k for k, syn in relative_date_range_abbreviations.items() if v in syn)
+    else:
+        v = RelativeDateRange(v)
+    return v
+
+
+def parse_relative_date_range(v: RelativeDateRange | str) -> tuple[date, date]:
     today = date.today()
+    v = resolve_relative_date_range(v)
     if v == RelativeDateRange.TODAY:
         return today, today
     elif v == RelativeDateRange.YESTERDAY:

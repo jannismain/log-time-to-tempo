@@ -97,6 +97,7 @@ lt config --unset
   - `month` → `last_30_days`
   - `week_to_date` → `week`
   - `month_to_date` → `month`
+- support abbreviations for relative date ranges (e.g. `l7` for `last_7_days`)
 - fix issue where app dir would not be created on first run
 - fix issue with formatted durations, where days would not be accounted for
 - parse more relative dates (e.g. "3 weeks ago") (using [`dateparser.parse`][dateparser.parse])

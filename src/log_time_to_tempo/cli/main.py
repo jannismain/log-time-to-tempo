@@ -1,6 +1,7 @@
 import os
 import shutil
 from datetime import date, datetime, time, timedelta
+from typing import Optional
 
 import jira
 import keyring
@@ -17,6 +18,19 @@ from .completions import complete_issue, complete_project
 
 token_found_in_environment = os.getenv('JIRA_API_TOKEN')
 config.load()
+
+arg_relative_date_range = typer.Argument(
+    callback=lambda x: _time.resolve_relative_date_range(x),
+    autocompletion=lambda incomplete: list(
+        (
+            v,
+            f'short: {", ".join(_time.relative_date_range_abbreviations.get(v))}'
+            if v in _time.relative_date_range_abbreviations
+            else '',
+        )
+        for v in _time.RelativeDateRange._value2member_map_.keys()
+    ),
+)
 
 
 @app.callback(
@@ -181,7 +195,7 @@ def log_time(
 @app.command('list', rich_help_panel='GET')
 def cmd_list(
     ctx: typer.Context,
-    date_range: Annotated[_time.RelativeDateRange, typer.Argument()] = 'week',
+    date_range: Annotated[_time.RelativeDateRange, arg_relative_date_range] = 'week',
     from_date: Annotated[date, typer.Option('--from', parser=_time.parse_date)] = None,
     to_date: Annotated[
         date, typer.Option('--to', parser=_time.parse_date, show_default='today')
@@ -204,8 +218,8 @@ def cmd_list(
 @app.command('stats', rich_help_panel='GET')
 def cmd_stats(
     ctx: typer.Context,
-    date_range: Annotated[_time.RelativeDateRange, typer.Argument()] = 'week',
-    from_date: Annotated[date, typer.Option('--from', parser=_time.parse_date)] = None,
+    date_range: Annotated[str, arg_relative_date_range] = 'week',
+    from_date: Annotated[Optional[date], typer.Option('--from', parser=_time.parse_date)] = None,
     to_date: Annotated[
         date, typer.Option('--to', parser=_time.parse_date, show_default='today')
     ] = datetime.now().date().strftime('%d.%m'),
@@ -217,12 +231,19 @@ def cmd_stats(
 
     $ lt list --from 1.12 --to 24.12
     """
-    typer.secho(
-        f"Period: {date_range.value if from_date is None else f'{from_date} - {to_date}'}",
-        bold=True,
-    )
     if from_date is None:
-        from_date, to_date = _time.parse_relative_date_range(date_range)
+        typer.secho(f'Period: {date_range.value}', bold=True)
+        try:
+            from_date, to_date = _time.parse_relative_date_range(date_range)
+        except ValueError:
+            typer.secho(f'Invalid date range: {date_range}', fg='red')
+            exit(1)
+    else:
+        typer.secho(
+            f"Period: {str(from_date) + (f' - {to_date}' if to_date != from_date else '')}",
+            bold=True,
+        )
+
     stats = {}
     for worklog in tempo.get_worklogs(ctx.obj.myself['key'], from_date, to_date):
         project = get_project_description(ctx, worklog.issue)
