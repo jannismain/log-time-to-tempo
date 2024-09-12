@@ -89,6 +89,13 @@ lt config --unset
 ### [latest]
 [latest]: https://github.com/jannismain/log-time-to-tempo/commits/main/
 
+<!-- ### [0.0.X] - 202X-XX-XX
+[0.0.3]: https://github.com/jannismain/log-time-to-tempo/releases/tag/v0.0.X -->
+
+
+### [0.0.3] - 2024-09-12
+[0.0.3]: https://github.com/jannismain/log-time-to-tempo/releases/tag/v0.0.3
+
 - add `lt stats` command to aggregate spent time per issue
 - add `lt alias` command to provide more meaningful aliases for issue descriptions
   - `lt alias --unset` to remove previously set aliases
