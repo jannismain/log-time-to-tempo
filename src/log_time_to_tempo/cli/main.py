@@ -40,7 +40,9 @@ arg_relative_date_range = typer.Argument(
 )
 def main(
     ctx: typer.Context,
-    token: Annotated[str, typer.Option(envvar='JIRA_API_TOKEN', show_default='prompt')] = None,
+    token: Annotated[
+        Optional[str], typer.Option(envvar='JIRA_API_TOKEN', show_default='prompt')
+    ] = None,
     instance: Annotated[str, typer.Option(envvar='JIRA_INSTANCE')] = 'https://jira.codecentric.de',
     verbose: Annotated[
         int,
