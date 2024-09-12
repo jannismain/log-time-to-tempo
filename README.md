@@ -100,6 +100,7 @@ lt config --unset
 - support abbreviations for relative date ranges (e.g. `l7` for `last_7_days`)
 - fix issue where app dir would not be created on first run
 - fix issue with formatted durations, where days would not be accounted for
+- fix issue where token was saved to third-party keyrings (e.g. 1Password)
 - parse more relative dates (e.g. "3 weeks ago") (using [`dateparser.parse`][dateparser.parse])
 
 ### [0.0.2] - 2024-04-17

@@ -5,6 +5,7 @@ from typing import Optional
 
 import jira
 import keyring
+import keyring.backends.macOS
 import rich
 import typer
 from click.shell_completion import CompletionItem
@@ -85,6 +86,10 @@ def main(
         return
 
     if token is None:
+        try:
+            keyring.set_keyring(keyring.backends.macOS.Keyring())
+        except Exception:
+            log.warning('Could not set keyring backend. Unsupported keyrings may lead to errors.')
         if 'JIRA_USER' in os.environ and (
             token := keyring.get_password(name, os.environ['JIRA_USER'])
         ):
