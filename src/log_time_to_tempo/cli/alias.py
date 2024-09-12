@@ -1,7 +1,9 @@
 import json
 from typing import Annotated
 
+import rich
 import typer
+from rich.table import Table
 from simple_term_menu import TerminalMenu
 
 from . import app, app_dir
@@ -36,7 +38,13 @@ def alias(
         return
     aliases = _read_aliases()
     if not issue:
-        typer.echo('\n'.join(f'{k}: {v}' for k, v in aliases.items()))
+        grid = Table(padding=(0, 1))
+        grid.add_column('Alias', justify='right', style='cyan')
+        grid.add_column('Issues', justify='left')
+        alias_values = sorted(set(aliases.values()))
+        for alias in alias_values:
+            grid.add_row(alias, '\n'.join(k for k, v in aliases.items() if v == alias))
+        rich.print(grid)
         return
     if issue in aliases:
         if not typer.confirm(f'Alias for {issue} already exists ({alias}). Overwrite?'):
