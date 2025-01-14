@@ -3,11 +3,13 @@ from typing import Annotated
 
 import rich
 import typer
+from click.shell_completion import CompletionItem
 from rich.table import Table
 from simple_term_menu import TerminalMenu
+from typer import Context
 
+from .. import _jira
 from . import app, app_dir
-from .completions import complete_issue
 
 fp_project_aliases = app_dir / 'aliases'
 
@@ -23,13 +25,21 @@ def _write_aliases(aliases):
     json.dump(aliases, fp_project_aliases.open('w'), indent=2)
 
 
+def complete_issue_aliased(ctx: Context, param: str, incomplete: str) -> list[CompletionItem]:
+    if ctx.params.get('unset'):
+        issues = _read_aliases()
+    else:
+        issues = _jira.get_all_issues(client=_jira.MockClient(), no_update_cache=True)
+    return [CompletionItem(key, help=description) for key, description in issues.items()]
+
+
 @app.command(rich_help_panel='Configuration')
 def alias(
     ctx: typer.Context,
     unset: Annotated[
         bool, typer.Option(help='unset a previously set alias', show_envvar=False)
     ] = False,
-    issue: Annotated[str, typer.Argument(shell_complete=complete_issue)] = None,
+    issue: Annotated[str, typer.Argument(shell_complete=complete_issue_aliased)] = None,
     alias: Annotated[str, typer.Argument()] = None,
 ):
     "Create an alias for an issue."

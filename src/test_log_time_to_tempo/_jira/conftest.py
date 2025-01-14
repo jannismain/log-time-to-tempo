@@ -1,6 +1,6 @@
 import pytest
 
-from log_time_to_tempo.cli.completions import MockClient, MockIssue, MockIssueFields, MockProject
+from log_time_to_tempo._jira import MockClient, MockIssue, MockIssueFields, MockProject
 
 
 class TestClient(MockClient):
