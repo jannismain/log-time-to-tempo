@@ -18,6 +18,7 @@ dependencies = [
   "rich",
   "python-dotenv",
   "keyring",
+  "keyrings-alt",  # less secure fallback, if no secure keyring is available
   "coloredlogs",
   "requests",
   "pydantic",
