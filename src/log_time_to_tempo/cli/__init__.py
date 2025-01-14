@@ -7,7 +7,7 @@ import typer
 from .. import name
 
 app_dir = pathlib.Path(click.get_app_dir(name))
-app = typer.Typer(no_args_is_help=True, rich_markup_mode='rich', chain=True)
+app = typer.Typer(no_args_is_help=True, rich_markup_mode='rich')
 
 
 def link(uri, label=None):
