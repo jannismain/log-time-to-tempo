@@ -83,7 +83,7 @@ def main(
     ctx.obj.aliases = alias._read_aliases()
 
     # return early for subcommands that don't interact with jira
-    if ctx.invoked_subcommand not in 'log issues list projects init *'.split():
+    if ctx.invoked_subcommand not in 'log issues list projects init stats *'.split():
         return
 
     if token is None:
