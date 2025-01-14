@@ -69,9 +69,9 @@ def test_cache_interpolated_name(mock):
     hello('bob')
     assert mock.load_cache('hello-bob') == 'Hello, Bob!', 'argument should appear in cache name'
     hello()
-    assert (
-        mock.load_cache('hello-world') == 'Hello, World!'
-    ), 'default value should appear in cache name'
+    assert mock.load_cache('hello-world') == 'Hello, World!', (
+        'default value should appear in cache name'
+    )
 
     cached_results = caching.get_caches_for(hello)
     assert cached_results, 'cached method should have been registered'

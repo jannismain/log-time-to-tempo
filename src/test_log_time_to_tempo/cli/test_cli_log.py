@@ -1,7 +1,6 @@
 from datetime import date, timedelta
 from typing import Callable
 
-import keyring
 import pytest
 from click.testing import Result
 from keyring.errors import PasswordDeleteError

@@ -179,14 +179,16 @@ def log_time(
     rich.print(
         'Log',
         _time.format_duration(duration),
-        f'({start.strftime('%H:%M')} - {end.strftime('%H:%M')})',
+        f'({start.strftime("%H:%M")} - {end.strftime("%H:%M")})',
         f'as [italic]{cfg.issue.fields.summary} ({description})[/italic]',
         f'for {_time.format_date_relative(day)}',
     )
 
     if duration_logged + duration > timedelta(hours=10):
         error(
-            f'You already have {_time.format_duration(duration_logged)} logged on that day. Cannot log more than 10h per day.'
+            f'You already have {
+                _time.format_duration(duration_logged)
+            } logged on that day. Cannot log more than 10h per day.'
         )
 
     if yes or typer.confirm('Continue?'):
@@ -218,7 +220,11 @@ def cmd_list(
         from_date, to_date = _time.parse_relative_date_range(date_range)
     for worklog in tempo.get_worklogs(ctx.obj.myself['key'], from_date, to_date):
         typer.echo(
-            f'{worklog.started.strftime("%d.%m %H:%M")}  {_time.format_duration_aligned(timedelta(seconds=worklog.timeSpentSeconds), 2)}  {get_project_description(ctx, worklog.issue)} ({worklog.issue.key}) - {worklog.comment}'
+            f'{worklog.started.strftime("%d.%m %H:%M")}  {
+                _time.format_duration_aligned(timedelta(seconds=worklog.timeSpentSeconds), 2)
+            }  {get_project_description(ctx, worklog.issue)} ({worklog.issue.key}) - {
+                worklog.comment
+            }'
         )
 
 
@@ -247,7 +253,7 @@ def cmd_stats(
             exit(1)
     else:
         typer.secho(
-            f"Period: {str(from_date) + (f' - {to_date}' if to_date != from_date else '')}",
+            f'Period: {str(from_date) + (f" - {to_date}" if to_date != from_date else "")}',
             bold=True,
         )
 
@@ -281,9 +287,10 @@ def cmd_stats(
         typer.echo(f'{typer.style(total_duration, bold=True)}  {project}')
         if ctx.obj.verbose > 0 or verbose > 0:
             for date, daily_stats in stats[project]['days'].items():
-                typer.echo(
-                    f'          {date}: {_time.format_duration_aligned(timedelta(seconds=daily_stats['timeSpentSeconds']))} - {", ".join(daily_stats['comments'])}'
+                timeSpent = _time.format_duration_aligned(
+                    timedelta(seconds=daily_stats['timeSpentSeconds'])
                 )
+                typer.echo(f'          {date}: {timeSpent} - , '.join(daily_stats['comments']))
     typer.secho('-' * 20)
     total_duration = _time.format_duration_aligned(
         timedelta(seconds=sum(project['timeSpentSeconds'] for project in stats.values()))
@@ -380,6 +387,11 @@ def init(
         typer.echo('project cache updated.')
         _jira.get_all_issues(ctx.obj.jira, update_cache=True)
         typer.echo('issue cache updated.')
+
+
+@app.command(hidden=True)
+def debug(ctx: typer.Context):
+    typer.echo(ctx.obj)
 
 
 def get_project_description(ctx, issue):

@@ -18,9 +18,7 @@ fp_config_default = app_dir / filename
 class ConfigOption(StrEnum):
     @staticmethod
     def _generate_next_value_(name, start, count, last_values):
-        """
-        Return the lower-cased version of the member name.
-        """
+        """Return the lower-cased version of the member name."""
         return name.upper()
 
     JIRA_INSTANCE = auto()

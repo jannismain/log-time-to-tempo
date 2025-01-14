@@ -160,7 +160,7 @@ def test_parse_relative_date_range():
         (date.today(), 'today'),
         (date.today() - timedelta(days=1), 'yesterday'),
         (date(year=date.today().year, month=3, day=12), '12.3'),
-        (date(year=date.today().year - 1, month=3, day=12), f'12.3.{date.today().year-1}'),
+        (date(year=date.today().year - 1, month=3, day=12), f'12.3.{date.today().year - 1}'),
     ],
 )
 def test_format_date_relative(d, expected):
