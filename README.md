@@ -92,6 +92,13 @@ lt config --unset
 <!-- ### [0.0.X] - 202X-XX-XX
 [0.0.3]: https://github.com/jannismain/log-time-to-tempo/releases/tag/v0.0.X -->
 
+### [0.0.4] - 2025-01-14
+[0.0.4]: https://github.com/jannismain/log-time-to-tempo/releases/tag/v0.0.4
+
+- fix keyring issues
+  - keyring provided by `1password-cli` could not be used to persist token → default to system keyring on macOS
+  - keyring fails on platforms other than macOS → alternative keyring backends are used.
+- fix issue where `lt init` would update cache twice.
 
 ### [0.0.3] - 2024-09-12
 [0.0.3]: https://github.com/jannismain/log-time-to-tempo/releases/tag/v0.0.3
