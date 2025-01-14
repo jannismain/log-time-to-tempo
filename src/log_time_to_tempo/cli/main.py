@@ -1,4 +1,5 @@
 import os
+import platform
 import shutil
 from datetime import date, datetime, time, timedelta
 from typing import Optional
@@ -86,10 +87,8 @@ def main(
         return
 
     if token is None:
-        try:
+        if platform.system() == 'Darwin':
             keyring.set_keyring(keyring.backends.macOS.Keyring())
-        except Exception:
-            log.warning('Could not set keyring backend. Unsupported keyrings may lead to errors.')
         if 'JIRA_USER' in os.environ and (
             token := keyring.get_password(name, os.environ['JIRA_USER'])
         ):
