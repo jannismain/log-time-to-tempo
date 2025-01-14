@@ -37,7 +37,7 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: CPython",
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
-license = "ISC"
+license-files = ["./LICENSE"]
 [project.optional-dependencies]
 test = ["pytest", "pytest-cov", "hypothesis", "ruff"]
 
