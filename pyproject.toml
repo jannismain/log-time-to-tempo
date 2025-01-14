@@ -18,7 +18,7 @@ dependencies = [
   "rich",
   "python-dotenv",
   "keyring",
-  "keyrings-alt",  # less secure fallback, if no secure keyring is available
+  "keyrings-alt",     # less secure fallback, if no secure keyring is available
   "coloredlogs",
   "requests",
   "pydantic",
@@ -37,11 +37,9 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: CPython",
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
+license = "ISC"
 [project.optional-dependencies]
 test = ["pytest", "pytest-cov", "hypothesis", "ruff"]
-
-[project.license]
-file = "LICENSE"
 
 [project.urls]
 Documentation = "https://github.com/jannismain/log-time-to-tempo#readme"
