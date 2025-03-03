@@ -204,7 +204,7 @@ def log_time(
 @app.command('list', rich_help_panel='GET')
 def cmd_list(
     ctx: typer.Context,
-    date_range: Annotated[_time.RelativeDateRange, arg_relative_date_range] = 'week',
+    date_range: Annotated[str, arg_relative_date_range] = 'week',
     from_date: Annotated[date, typer.Option('--from', parser=_time.parse_date)] = None,
     to_date: Annotated[
         date, typer.Option('--to', parser=_time.parse_date, show_default='today')

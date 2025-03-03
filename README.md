@@ -90,7 +90,12 @@ lt config --unset
 [latest]: https://github.com/jannismain/log-time-to-tempo/commits/main/
 
 <!-- ### [0.0.X] - 202X-XX-XX
-[0.0.3]: https://github.com/jannismain/log-time-to-tempo/releases/tag/v0.0.X -->
+[0.0.X]: https://github.com/jannismain/log-time-to-tempo/releases/tag/v0.0.X -->
+
+### [0.0.5] - 2025-03-03
+[0.0.5]: https://github.com/jannismain/log-time-to-tempo/releases/tag/v0.0.5
+
+- fix `lt list` command
 
 ### [0.0.4] - 2025-01-14
 [0.0.4]: https://github.com/jannismain/log-time-to-tempo/releases/tag/v0.0.4
