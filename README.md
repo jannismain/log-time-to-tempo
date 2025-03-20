@@ -63,8 +63,19 @@ lt stats month
 lt stats -v
 ```
 
-## Configuration
+### Set Aliases
 
+```sh
+# set alias name for a commonly used issue
+lt alias TSI-7 OPT
+lt alias TS-10402 ProjectName
+# unset aliases
+lt alias --unset ProjectName
+# show all aliases
+lt alias
+```
+
+## Configuration
 
 The `lt config` command allows to change the default behavior, either system wide (`--system`) or in the local directory and subdirectories.
 
