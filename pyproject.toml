@@ -58,6 +58,7 @@ dependencies = ["ruff"]
 [tool.hatch.envs.default.scripts]
 test = "hatch run test:test"
 release = "hatch run test:release"
+publish = "hatch run test:publish"
 
 [tool.hatch.envs.test]
 dependencies = ["pytest", "pytest-cov", "hypothesis"]
@@ -69,7 +70,11 @@ echo "Forgot anything? Press CTRL+C to abort..."
 sleep 5
 git tag -m 'bump version to '`hatch version` v`hatch version` --sign
 git push --tags
+rm -rf dist/log_time_to_tempo-*
 hatch build --clean
+hatch run test:publish
+"""
+publish = """\
 hatch publish
 glab release create v`hatch version` \
     --name v`hatch version` \
