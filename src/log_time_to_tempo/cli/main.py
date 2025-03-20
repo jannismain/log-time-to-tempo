@@ -178,9 +178,9 @@ def log_time(
         )
 
         if similar_issues and len(similar_issues) == 1:
-            suggested_issue = next(k for k in similar_issues)
+            suggested_issue, issue_summary = next((k, v) for k, v in similar_issues.items())
             # only one similar issue, we can assume the user meant this issue and continue
-            if typer.confirm(f"Did you mean '{suggested_issue}'?", default=True):
+            if typer.confirm(f"Did you mean '{suggested_issue}' ({issue_summary})?", default=True):
                 ctx.invoke(
                     log_time,
                     duration=duration,
