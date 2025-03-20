@@ -84,7 +84,7 @@ def main(
     ctx.obj.aliases = alias._read_aliases()
 
     # return early for subcommands that don't interact with jira
-    if ctx.invoked_subcommand not in 'log issues list projects init stats *'.split():
+    if ctx.invoked_subcommand not in 'log logm issues list projects init stats *'.split():
         return
 
     if token is None:
@@ -240,6 +240,42 @@ def log_time(
             time_spent_seconds=duration.total_seconds(),
             message=message,
         )
+
+
+@app.command('logm', rich_help_panel='POST')
+def log_multi(
+    ctx: typer.Context,
+    entries: Annotated[str, typer.Argument()],
+    day: Annotated[
+        date, typer.Option(parser=_time.parse_date, show_envvar=False, show_default='today')
+    ] = datetime.now().date(),
+    start: Annotated[time, typer.Option(parser=_time.parse_time, show_default='9')] = None,
+    end: Annotated[time, typer.Option(parser=_time.parse_time)] = None,
+    message: Annotated[str, typer.Option('--message', '-m')] = None,
+    yes: Annotated[bool, typer.Option('--yes', '-y', help='log time without confirmation')] = False,
+):
+    "Log multiple time entries at once."
+    if ctx.resilient_parsing:  # script is running for completion purposes
+        return
+
+    for entry in entries.split(','):
+        if not entry:
+            continue
+        try:
+            issue, duration = entry.split(':', 1)
+            ctx.invoke(
+                log_time,
+                duration=_time.parse_duration(duration),
+                issue=issue,
+                day=day,
+                start=start,
+                end=end,
+                message=message,
+                yes=yes,
+                ctx=ctx,
+            )
+        except ValueError:
+            error(f'Invalid entry: {entry}')
 
 
 @app.command('list', rich_help_panel='GET')

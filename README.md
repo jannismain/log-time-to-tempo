@@ -90,6 +90,7 @@ lt config --unset
 [latest]: https://github.com/jannismain/log-time-to-tempo/commits/main/
 
 - when logging to an issue that does not exist, provide suggestions (based on similar aliases and issue summaries)
+- add `lt logm` command to log multiple entries at once (e.g. `lt logm MyProject:6,OPT:2`)
 
 <!-- ### [0.0.X] - 202X-XX-XX
 [0.0.X]: https://github.com/jannismain/log-time-to-tempo/releases/tag/v0.0.X -->
