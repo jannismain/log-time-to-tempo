@@ -89,6 +89,8 @@ lt config --unset
 ### [latest]
 [latest]: https://github.com/jannismain/log-time-to-tempo/commits/main/
 
+- when logging to an issue that does not exist, provide suggestions (based on similar aliases and issue summaries)
+
 <!-- ### [0.0.X] - 202X-XX-XX
 [0.0.X]: https://github.com/jannismain/log-time-to-tempo/releases/tag/v0.0.X -->
 

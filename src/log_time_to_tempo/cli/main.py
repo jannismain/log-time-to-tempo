@@ -2,6 +2,7 @@ import os
 import platform
 import shutil
 from datetime import date, datetime, time, timedelta
+from difflib import get_close_matches
 from typing import Optional
 
 import jira
@@ -152,11 +153,51 @@ def log_time(
     if ctx.resilient_parsing:  # script is running for completion purposes
         return
     cfg = ctx.obj
-
     if issue in ctx.obj.aliases.values():
         issue = next(k for k, v in ctx.obj.aliases.items() if v == issue)
 
-    cfg.issue = cfg.jira.issue(issue, fields='summary,comment')
+    try:
+        cfg.issue = cfg.jira.issue(issue, fields='summary,comment')
+    except jira.JIRAError as e:
+        # If not issue is found, try to figure out what the user meant
+        fuzzy_matches = set(get_close_matches(issue, ctx.obj.aliases.values(), n=5, cutoff=0.6))
+        similar_issues = {
+            value: f'alias for {key}'
+            for key, value in ctx.obj.aliases.items()
+            if value in fuzzy_matches
+        }
+
+        # Also check jira issue summaries for matches
+        similar_issues.update(
+            {
+                key: summary
+                for key, summary in _jira.get_all_issues(ctx.obj.jira).items()
+                if issue.lower() in summary.lower()
+                and not any(key in v for v in similar_issues.values())
+            }
+        )
+
+        if similar_issues and len(similar_issues) == 1:
+            suggested_issue = next(k for k in similar_issues)
+            # only one similar issue, we can assume the user meant this issue and continue
+            if typer.confirm(f"Did you mean '{suggested_issue}'?", default=True):
+                ctx.invoke(
+                    log_time,
+                    duration=duration,
+                    issue=suggested_issue,
+                    day=day,
+                    start=start,
+                    end=end,
+                    lunch=lunch,
+                    message=message,
+                    yes=yes,
+                    ctx=ctx,
+                )
+            return
+        typer.secho(f'Error: {e.text.lower()} ({issue})', fg='red')
+        if similar_issues and len(similar_issues) > 1:
+            typer.secho(f'Did you mean: {", ".join(similar_issues)}', fg='red', italic=True)
+        return
     description = get_project_description(ctx, cfg.issue)
 
     worklogs = tempo.get_worklogs(ctx.obj.myself['key'], day, day)
