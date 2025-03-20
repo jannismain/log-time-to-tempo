@@ -217,6 +217,17 @@ def log_time(
         duration -= lunch
         end = (datetime.combine(day, end) - lunch).time()
 
+    # Detect overlap with existing worklogs and warn user
+    for worklog in worklogs:
+        if (
+            worklog.started.time() < end
+            and (worklog.started + timedelta(seconds=worklog.timeSpentSeconds)).time() > start
+        ):
+            typer.secho(
+                f'Warning: The time entry overlaps with an existing worklog from {worklog.started.strftime("%H:%M")} to {(worklog.started + timedelta(seconds=worklog.timeSpentSeconds)).strftime("%H:%M")}',
+                fg='yellow',
+            )
+
     rich.print(
         'Log',
         _time.format_duration(duration),
