@@ -50,6 +50,8 @@ lt log 2h
 lt log 2h TSI-1
 # log with custom message
 lt log -m "working on foo" 2h TSI-1
+# log multiple entries at once
+lt logm MyProject:6,OPT:2
 ```
 
 ### Check Logged Time
