@@ -107,6 +107,7 @@ lt config --unset
 
 - show issue summary when suggesting similar issues
 - detect overlaps with existing issues and warn user
+- fix issue, where a custom default start time would prevent dynamic start time based on today's last worklog
 
 ### [0.0.6] - 2025-03-20
 [0.0.6]: https://github.com/jannismain/log-time-to-tempo/releases/tag/v0.0.6

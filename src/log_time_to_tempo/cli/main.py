@@ -143,7 +143,12 @@ def log_time(
     day: Annotated[
         date, typer.Option(parser=_time.parse_date, show_envvar=False, show_default='today')
     ] = datetime.now().date(),
-    start: Annotated[time, typer.Option(parser=_time.parse_time, show_default='9')] = None,
+    start: Annotated[
+        time,
+        typer.Option(
+            parser=_time.parse_time, show_default='9', allow_from_autoenv=False
+        ),  # envvar is read below, so we can differentiate between custom default from env and provided value
+    ] = None,
     end: Annotated[time, typer.Option(parser=_time.parse_time)] = None,
     lunch: Annotated[timedelta, typer.Option(parser=_time.parse_duration)] = None,
     message: Annotated[str, typer.Option('--message', '-m')] = None,
