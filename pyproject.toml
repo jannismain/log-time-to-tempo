@@ -65,10 +65,10 @@ dependencies = ["pytest", "pytest-cov", "hypothesis"]
 test = "pytest --cov-config=pyproject.toml --cov-report=term --cov-report html:build/coverage --cov=log_time_to_tempo --cov-report xml"
 release = """\
 hatch run test:test
-git tag -m 'bump version to '`hatch version` v`hatch version` --sign
-git push --tags
 echo "Forgot anything? Press CTRL+C to abort..."
 sleep 5
+git tag -m 'bump version to '`hatch version` v`hatch version` --sign
+git push --tags
 hatch build --clean
 hatch publish
 glab release create v`hatch version` \
