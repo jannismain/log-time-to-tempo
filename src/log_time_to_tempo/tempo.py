@@ -35,7 +35,6 @@ def get_worklogs(worker_id: str, from_date: date, to_date: date):
         'to': to_date.isoformat(),
     }
     response = _post('search', json=payload)
-    log.debug(response.text)
     return [Worklog(**item) for item in response.json()]
 
 
@@ -54,10 +53,7 @@ def create_worklog(
     }
     if message is not None:
         payload['comment'] = message
-    log.info(payload)
-
-    response = _post(json=payload)
-    log.debug(response.text)
+    _post(json=payload)
 
 
 def _post(endpoint: str = '', **kwargs):
