@@ -2,4 +2,4 @@ from types import SimpleNamespace
 
 cfg = SimpleNamespace()
 name = 'lt'
-__version__ = '0.0.6'
+__version__ = '0.0.7'

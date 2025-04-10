@@ -311,14 +311,34 @@ def cmd_list(
     """
     if from_date is None:
         from_date, to_date = _time.parse_relative_date_range(date_range)
+
+    table = Table(box=None)
+    table.add_column('Date', style='cyan')
+    table.add_column('Time', style='cyan')
+    table.add_column(' ', justify='right')
+    table.add_column('Project', style='green')
+    table.add_column('Issue', style='blue')
+    table.add_column('Comment')
+
+    total_seconds = 0
+    previous_worklog_date = None
     for worklog in tempo.get_worklogs(ctx.obj.myself['key'], from_date, to_date):
-        typer.echo(
-            f'{worklog.started.strftime("%d.%m %H:%M")}  {
-                _time.format_duration_aligned(timedelta(seconds=worklog.timeSpentSeconds), 2)
-            }  {get_project_description(ctx, worklog.issue)} ({worklog.issue.key}) - {
-                worklog.comment
-            }'
+        table.add_row(
+            worklog.started.strftime('%d.%m')
+            if worklog.started.date() != previous_worklog_date
+            else '',
+            worklog.started.strftime('%H:%M'),
+            _time.format_duration_aligned(timedelta(seconds=worklog.timeSpentSeconds), 2),
+            get_project_description(ctx, worklog.issue),
+            worklog.issue.key,
+            worklog.comment or '',
         )
+        total_seconds += worklog.timeSpentSeconds
+        previous_worklog_date = worklog.started.date()
+    rich.print(table)
+    rich.print(
+        f'\n[italic]You have logged [bold]{_time.format_duration(timedelta(seconds=total_seconds))}[/bold] from {from_date} to {to_date}.[/italic]'
+    )
 
 
 @app.command('stats', rich_help_panel='GET')

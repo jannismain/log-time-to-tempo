@@ -105,6 +105,10 @@ lt config --unset
 <!-- ### [0.0.X] - 202X-XX-XX
 [0.0.X]: https://github.com/jannismain/log-time-to-tempo/releases/tag/v0.0.X -->
 
+### [0.0.7] - 2025-04-10
+[0.0.7]: https://github.com/jannismain/log-time-to-tempo/releases/tag/v0.0.7
+
+- `list` command produces output in table format
 - show issue summary when suggesting similar issues
 - detect overlaps with existing issues and warn user
 - fix issue, where a custom default start time would prevent dynamic start time based on today's last worklog
