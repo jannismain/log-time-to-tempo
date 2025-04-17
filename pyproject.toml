@@ -72,7 +72,6 @@ git tag -m 'bump version to '`hatch version` v`hatch version` --sign
 git push --tags
 rm -rf dist/log_time_to_tempo-*
 hatch build --clean
-hatch run test:publish
 """
 publish = """\
 hatch publish
