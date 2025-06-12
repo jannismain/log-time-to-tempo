@@ -122,9 +122,22 @@ def _duration_to_hours_and_minutes(duration: timedelta) -> tuple[int, int]:
     return hours, minutes
 
 
+def _duration_to_workdays_and_hours(duration: timedelta) -> tuple[int, int]:
+    workdays, remainder = divmod(int(duration.total_seconds()), 60 * 60 * 8)
+    hours, _ = divmod(remainder, 60 * 60)
+    return workdays, hours
+
+
 def format_duration(duration: timedelta) -> str:
     hours, minutes = _duration_to_hours_and_minutes(duration)
     return f'{hours}h{f" {minutes}m" if minutes else ""}'
+
+
+def format_duration_workdays(duration: timedelta | int, max_day_digits=1) -> str:
+    if isinstance(duration, int):
+        duration = timedelta(seconds=duration)
+    workdays, hours = _duration_to_workdays_and_hours(duration)
+    return f'{workdays:{max_day_digits}d}d{f" {hours}h" if hours else ""}'
 
 
 def format_duration_aligned(duration: timedelta, max_hour_digits=3) -> str:

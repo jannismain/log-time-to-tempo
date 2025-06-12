@@ -84,7 +84,7 @@ def main(
     ctx.obj.aliases = alias._read_aliases()
 
     # return early for subcommands that don't interact with jira
-    if ctx.invoked_subcommand not in 'log logm issues list projects init stats *'.split():
+    if ctx.invoked_subcommand not in 'log logm issues list projects init stats budget *'.split():
         return
 
     if token is None:
@@ -294,6 +294,9 @@ def log_multi(
             error(f'Invalid entry: {entry}')
 
 
+# TODO: Combine `stats` and `list` commands into one command with a flag whether to aggregate projects
+
+
 @app.command('list', rich_help_panel='GET')
 def cmd_list(
     ctx: typer.Context,
@@ -431,6 +434,77 @@ def issues(
     grid.add_column('Issue', justify='left')
     for key, summary in issues.items():
         grid.add_row(key, summary)
+    rich.print(grid)
+
+
+@app.command(rich_help_panel='GET')
+def budget(
+    ctx: typer.Context,
+    issue: Annotated[str, typer.Argument(envvar='JIRA_ISSUE', shell_complete=complete_issue)] = '*',
+):
+    "List issues"
+    if issue in ctx.obj.aliases.values():
+        issue = next(k for k, v in ctx.obj.aliases.items() if v == issue)
+
+    try:
+        issue = ctx.obj.jira.issue(issue)
+        worklogs = ctx.obj.jira.worklogs(issue=issue)
+    except jira.JIRAError as e:
+        error(e.text)
+
+    logged_secs_per_person = {
+        w.author.displayName: sum(w2.timeSpentSeconds for w2 in worklogs if w2.author == w.author)
+        for w in worklogs
+    }
+
+    tt = issue.fields.timetracking
+
+    grid = Table(padding=(0, 1))
+    grid.add_column('', justify='right', style='cyan')
+    grid.add_column('PT', justify='left')
+    grid.add_column('Hours', justify='right')
+    grid.add_column('%', justify='right')
+
+    grid.add_row(
+        'Estimate',
+        _time.format_duration_workdays(tt.originalEstimateSeconds, max_day_digits=2),
+        f'{tt.originalEstimateSeconds // 60 // 60}h',
+        style='bold',
+    )
+    grid.add_row(
+        'Used (total)',
+        _time.format_duration_workdays(tt.timeSpentSeconds, max_day_digits=2),
+        f'{tt.timeSpentSeconds // 60 // 60}h',
+        f'{(tt.timeSpentSeconds / tt.originalEstimateSeconds * 100):.1f}%',
+        style='bold',
+    )
+    for person, logged_secs in logged_secs_per_person.items():
+        grid.add_row(
+            person,
+            _time.format_duration_workdays(logged_secs, max_day_digits=2),
+            f'{logged_secs // 60 // 60}h',
+            f'{(logged_secs / tt.timeSpentSeconds * 100):.1f}%',
+            style='dim',
+        )
+    grid.add_row(
+        'Remaining',
+        _time.format_duration_workdays(tt.remainingEstimateSeconds, max_day_digits=2),
+        f'{tt.remainingEstimateSeconds // 60 // 60}h',
+        f'{(tt.remainingEstimateSeconds / tt.originalEstimateSeconds * 100):.1f}%',
+        style='bold',
+    )
+    if tt.remainingEstimateSeconds > 0:
+        for person, logged_secs in logged_secs_per_person.items():
+            remaining_for_person = int(
+                tt.remainingEstimateSeconds * (logged_secs / tt.timeSpentSeconds)
+            )
+            grid.add_row(
+                person,
+                _time.format_duration_workdays(remaining_for_person, max_day_digits=2),
+                f'{remaining_for_person // 60 // 60}h',
+                style='dim',
+            )
+
     rich.print(grid)
 
 

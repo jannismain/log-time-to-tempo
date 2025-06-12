@@ -65,6 +65,13 @@ lt stats month
 lt stats -v
 ```
 
+### Check Budget (i.e. logged and remaining time per person)
+
+```sh
+# show remaining time
+lt budget TS-XXXXX
+```
+
 ### Set Aliases
 
 ```sh
@@ -100,12 +107,16 @@ lt config --unset
 ## Changes
 
 ### [latest]
+
 [latest]: https://github.com/jannismain/log-time-to-tempo/commits/main/
 
 <!-- ### [0.0.X] - 202X-XX-XX
 [0.0.X]: https://github.com/jannismain/log-time-to-tempo/releases/tag/v0.0.X -->
 
+- `budget` command shows logged and remaining hours for a given issue
+
 ### [0.0.7] - 2025-04-10
+
 [0.0.7]: https://github.com/jannismain/log-time-to-tempo/releases/tag/v0.0.7
 
 - `list` command produces output in table format
@@ -114,17 +125,20 @@ lt config --unset
 - fix issue, where a custom default start time would prevent dynamic start time based on today's last worklog
 
 ### [0.0.6] - 2025-03-20
+
 [0.0.6]: https://github.com/jannismain/log-time-to-tempo/releases/tag/v0.0.6
 
 - when logging to an issue that does not exist, provide suggestions (based on similar aliases and issue summaries)
 - add `lt logm` command to log multiple entries at once (e.g. `lt logm MyProject:6,OPT:2`)
 
 ### [0.0.5] - 2025-03-03
+
 [0.0.5]: https://github.com/jannismain/log-time-to-tempo/releases/tag/v0.0.5
 
 - fix `lt list` command
 
 ### [0.0.4] - 2025-01-14
+
 [0.0.4]: https://github.com/jannismain/log-time-to-tempo/releases/tag/v0.0.4
 
 - on `lt alias --unset` completion, only existing aliases are suggested
@@ -134,6 +148,7 @@ lt config --unset
 - fix issue where `lt init` would update cache twice.
 
 ### [0.0.3] - 2024-09-12
+
 [0.0.3]: https://github.com/jannismain/log-time-to-tempo/releases/tag/v0.0.3
 
 - add `lt stats` command to aggregate spent time per issue
@@ -151,6 +166,7 @@ lt config --unset
 - parse more relative dates (e.g. "3 weeks ago") (using [`dateparser.parse`][dateparser.parse])
 
 ### [0.0.2] - 2024-04-17
+
 [0.0.2]: https://github.com/jannismain/log-time-to-tempo/releases/tag/v0.0.2
 
 - add `log --lunch` option to reduce the amount of math you have to do in your head when entering your time
@@ -160,6 +176,7 @@ lt config --unset
 - add `--version` flag
 
 ### [0.0.1] - 2024-03-25
+
 [0.0.1]: https://github.com/jannismain/log-time-to-tempo/releases/tag/v0.0.1
 
 - authorize with JIRA instance using personal access token
