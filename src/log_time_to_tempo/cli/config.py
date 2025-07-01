@@ -5,6 +5,7 @@ from typing import Annotated
 import dotenv
 import rich
 import typer
+from click.shell_completion import CompletionItem
 from dotenv import dotenv_values, find_dotenv, load_dotenv
 
 from .. import name
@@ -27,6 +28,15 @@ class ConfigOption(StrEnum):
     LT_LOG_START = auto()
     LT_LOG_MESSAGE = auto()
     LT_LOG_DURATION = auto()
+
+
+def complete_config_option(ctx, param: str, incomplete: str) -> list[CompletionItem]:
+    """Provide shell completion for config options."""
+    return [
+        CompletionItem(option.value, help=f"Configuration option: {option.value}")
+        for option in ConfigOption
+        if option.value.startswith(incomplete.upper())
+    ]
 
 
 def ensure_app_dir_exists():
@@ -56,8 +66,8 @@ def load():
 @app.command(rich_help_panel='Configuration')
 def config(
     key: Annotated[
-        ConfigOption,
-        typer.Argument(help='Read or update this configuration option', show_default=False),
+        str,
+        typer.Argument(help='Read or update this configuration option', show_default=False, shell_complete=complete_config_option),
     ] = None,
     value: Annotated[
         str,
@@ -90,6 +100,17 @@ def config(
     ] = False,
 ):
     "Interact with configuration."
+    
+    # Validate the key if provided
+    if key is not None:
+        try:
+            key = ConfigOption(key)
+        except ValueError:
+            valid_options = ', '.join([f"'{option.value}'" for option in ConfigOption])
+            typer.echo(f"Error: '{key}' is not a valid configuration option.", err=True)
+            typer.echo(f"Valid options are: {valid_options}", err=True)
+            raise typer.Exit(1) from None
+    
     # Determine which configuration files to interact with
     config_files = []
     fp_closest_local_config = find_local_config()
