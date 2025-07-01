@@ -5,7 +5,6 @@ from typing import Annotated
 import dotenv
 import rich
 import typer
-from click.shell_completion import CompletionItem
 from dotenv import dotenv_values, find_dotenv, load_dotenv
 
 from .. import name
@@ -14,6 +13,29 @@ from . import app, app_dir, link
 
 filename = f'.{name}'
 fp_config_default = app_dir / filename
+
+
+class ConfigOptionChoice(typer.completion.click.Choice):
+    """Custom Choice type that hides enum options from usage line but provides clear error messages."""
+
+    def __init__(self, choices, case_sensitive=True):
+        super().__init__(choices, case_sensitive)
+
+    def get_metavar(self, param):
+        """Override to not show choices in usage line."""
+        return None
+
+    def convert(self, value, param, ctx):
+        """Custom conversion with clear error messages."""
+        try:
+            return super().convert(value, param, ctx)
+        except typer.completion.click.BadParameter:
+            # Custom error message without redundancy
+            valid_options = ', '.join([f"'{choice}'" for choice in self.choices])
+            raise typer.completion.click.BadParameter(
+                f"'{value}' is not a valid configuration option.\n"
+                f'Valid options are: {valid_options}'
+            ) from None
 
 
 class ConfigOption(StrEnum):
@@ -30,10 +52,14 @@ class ConfigOption(StrEnum):
     LT_LOG_DURATION = auto()
 
 
-def complete_config_option(ctx, param: str, incomplete: str) -> list[CompletionItem]:
+def complete_config_option(
+    ctx, param: str, incomplete: str
+) -> list[typer.completion.click.shell_completion.CompletionItem]:
     """Provide shell completion for config options."""
     return [
-        CompletionItem(option.value, help=f"Configuration option: {option.value}")
+        typer.completion.click.shell_completion.CompletionItem(
+            option.value, help=f'Configuration option: {option.value}'
+        )
         for option in ConfigOption
         if option.value.startswith(incomplete.upper())
     ]
@@ -67,7 +93,14 @@ def load():
 def config(
     key: Annotated[
         str,
-        typer.Argument(help='Read or update this configuration option', show_default=False, shell_complete=complete_config_option),
+        typer.Argument(
+            help='Read or update this configuration option',
+            show_default=False,
+            shell_complete=complete_config_option,
+            click_type=ConfigOptionChoice(
+                [option.value for option in ConfigOption], case_sensitive=False
+            ),
+        ),
     ] = None,
     value: Annotated[
         str,
@@ -100,17 +133,11 @@ def config(
     ] = False,
 ):
     "Interact with configuration."
-    
-    # Validate the key if provided
+
+    # Convert string key to enum if provided
     if key is not None:
-        try:
-            key = ConfigOption(key)
-        except ValueError:
-            valid_options = ', '.join([f"'{option.value}'" for option in ConfigOption])
-            typer.echo(f"Error: '{key}' is not a valid configuration option.", err=True)
-            typer.echo(f"Valid options are: {valid_options}", err=True)
-            raise typer.Exit(1) from None
-    
+        key = ConfigOption(key.upper())
+
     # Determine which configuration files to interact with
     config_files = []
     fp_closest_local_config = find_local_config()
