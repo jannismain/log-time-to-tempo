@@ -400,23 +400,30 @@ def cmd_stats(
             stats[project]['days'][date]['comments'].add(worklog.comment)
             stats[project]['days'][date]['timeSpentSeconds'] += worklog.timeSpentSeconds
 
+    MAX_COL_WIDTH = 20
+    col_width = min(max(len(p) for p in stats), MAX_COL_WIDTH)
     for project in sorted(stats, key=lambda k: stats[k]['timeSpentSeconds'], reverse=True):
         total_duration = _time.format_duration_aligned(
             timedelta(seconds=stats[project]['timeSpentSeconds'])
         )
-        
+
         # Generate sparkline for this project
-        sparkline = generate_sparkline_from_daily_data(
-            stats[project]['days'], from_date, to_date
-        )
-        
+        sparkline = generate_sparkline_from_daily_data(stats[project]['days'], from_date, to_date)
+
         # Display project with sparkline
+        if len(project) > col_width:
+            project_str = project[: col_width - 2] + '..'
+        else:
+            project_str = project.ljust(col_width)
+
         if sparkline:
             # Add a subtle visual separator and context
-            typer.echo(f'{typer.style(total_duration, bold=True)}  {project}  {typer.style(sparkline, fg="cyan")}')
+            typer.echo(
+                f'{typer.style(total_duration, bold=True)}  {project_str}  {typer.style(sparkline, fg="cyan")}'
+            )
         else:
             typer.echo(f'{typer.style(total_duration, bold=True)}  {project}')
-            
+
         if ctx.obj.verbose > 0 or verbose > 0:
             for date, daily_stats in stats[project]['days'].items():
                 timeSpent = _time.format_duration_aligned(
