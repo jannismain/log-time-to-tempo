@@ -60,9 +60,10 @@ dependencies = ["ruff"]
 test = "hatch run test:test"
 release = "hatch run test:release"
 publish = "hatch run test:publish"
+build = "hatch run build:build"
 
 [tool.hatch.envs.test]
-dependencies = ["pytest", "pytest-cov", "hypothesis"]
+dependencies = ["pytest", "pytest-cov", "hypothesis", "hatchling"]
 [tool.hatch.envs.test.scripts]
 test = "pytest --cov-config=pyproject.toml --cov-report=term --cov-report html:build/coverage --cov=log_time_to_tempo --cov-report xml"
 release = """\
@@ -72,7 +73,8 @@ sleep 5
 git tag -m 'bump version to '`hatch version` v`hatch version` --sign
 git push --tags
 rm -rf dist/log_time_to_tempo-*
-hatch build --clean
+hatch run build:build
+hatch run test:publish
 """
 publish = """\
 hatch publish
@@ -84,6 +86,12 @@ gh release create v`hatch version` \
     --title v`hatch version` \
     --notes '*[see changes](https://github.com/jannismain/log-time-to-tempo/blob/main/README.md#'`hatch version | tr -d .`'---'`date -Idate`')*' \
     dist/*
+"""
+[tool.hatch.envs.build]
+dependencies = ["hatchling"]
+[tool.hatch.envs.build.scripts]
+build = """\
+hatch build --clean
 """
 
 [tool.coverage.run]
