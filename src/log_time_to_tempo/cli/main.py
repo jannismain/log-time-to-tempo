@@ -354,15 +354,19 @@ def cmd_stats(
         date, typer.Option('--to', parser=_time.parse_date, show_default='today')
     ] = datetime.now().date().strftime('%d.%m'),
     verbose: Annotated[int, typer.Option('-v', count=True)] = 0,
+    no_sparkline: Annotated[bool, typer.Option('--no-sparkline', envvar='LT_STATS_NO_SPARKLINE', help='Disable sparkline visualization')] = False,
 ):
     """Show logged time per project.
 
-    Projects are displayed with total time spent and a sparkline visualization
+    Projects are displayed with total time spent and optionally a sparkline visualization
     showing daily time patterns over the selected period.
 
     For a custom time range, use the --from and --to options:
 
     $ lt list --from 1.12 --to 24.12
+    
+    Use --no-sparkline to disable the sparkline visualization, or set the
+    environment variable LT_STATS_NO_SPARKLINE=1.
     """
     if from_date is None:
         typer.secho(f'Period: {date_range.value}', bold=True)
@@ -407,8 +411,8 @@ def cmd_stats(
             timedelta(seconds=stats[project]['timeSpentSeconds'])
         )
 
-        # Generate sparkline for this project
-        sparkline = generate_sparkline_from_daily_data(stats[project]['days'], from_date, to_date)
+        # Generate sparkline for this project (if not disabled)
+        sparkline = '' if no_sparkline else generate_sparkline_from_daily_data(stats[project]['days'], from_date, to_date)
 
         # Display project with sparkline
         if len(project) > col_width:
