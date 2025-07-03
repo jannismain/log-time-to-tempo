@@ -17,6 +17,7 @@ from typing_extensions import Annotated
 
 from .. import __version__, _jira, _time, caching, cfg, name, tempo
 from .._logging import log
+from .._sparkline import generate_sparkline_from_daily_data
 from . import alias, app, config, error, link
 from .completions import complete_issue, complete_project
 
@@ -356,6 +357,9 @@ def cmd_stats(
 ):
     """Show logged time per project.
 
+    Projects are displayed with total time spent and a sparkline visualization
+    showing daily time patterns over the selected period.
+
     For a custom time range, use the --from and --to options:
 
     $ lt list --from 1.12 --to 24.12
@@ -400,7 +404,19 @@ def cmd_stats(
         total_duration = _time.format_duration_aligned(
             timedelta(seconds=stats[project]['timeSpentSeconds'])
         )
-        typer.echo(f'{typer.style(total_duration, bold=True)}  {project}')
+        
+        # Generate sparkline for this project
+        sparkline = generate_sparkline_from_daily_data(
+            stats[project]['days'], from_date, to_date
+        )
+        
+        # Display project with sparkline
+        if sparkline:
+            # Add a subtle visual separator and context
+            typer.echo(f'{typer.style(total_duration, bold=True)}  {project}  {typer.style(sparkline, fg="cyan")}')
+        else:
+            typer.echo(f'{typer.style(total_duration, bold=True)}  {project}')
+            
         if ctx.obj.verbose > 0 or verbose > 0:
             for date, daily_stats in stats[project]['days'].items():
                 timeSpent = _time.format_duration_aligned(

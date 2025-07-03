@@ -25,6 +25,7 @@ dependencies = [
   "python-dateutil",
   "simple-term-menu", # https://github.com/IngoMeyer441/simple-term-menu
   "dateparser",
+  "sparklines",       # for time visualization in stats command
 ]
 classifiers = [
   "Development Status :: 4 - Beta",
