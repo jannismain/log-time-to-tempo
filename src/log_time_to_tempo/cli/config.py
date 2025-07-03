@@ -45,6 +45,7 @@ class ConfigOption(StrEnum):
         return name.upper()
 
     JIRA_INSTANCE = auto()
+    JIRA_USER = auto()
     # log command
     LT_LOG_ISSUE = auto()
     LT_LOG_START = auto()
