@@ -114,6 +114,7 @@ lt config --unset
 [0.0.X]: https://github.com/jannismain/log-time-to-tempo/releases/tag/v0.0.X -->
 
 - `budget` command shows logged and remaining hours for a given issue
+- fix redundant display of configuration options in `config` command error messages
 
 ### [0.0.7] - 2025-04-10
 

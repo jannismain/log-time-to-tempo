@@ -15,6 +15,29 @@ filename = f'.{name}'
 fp_config_default = app_dir / filename
 
 
+class ConfigOptionChoice(typer.completion.click.Choice):
+    """Custom Choice type that hides enum options from usage line but provides clear error messages."""
+
+    def __init__(self, choices, case_sensitive=True):
+        super().__init__(choices, case_sensitive)
+
+    def get_metavar(self, param):
+        """Override to not show choices in usage line."""
+        return None
+
+    def convert(self, value, param, ctx):
+        """Custom conversion with clear error messages."""
+        try:
+            return super().convert(value, param, ctx)
+        except typer.completion.click.BadParameter:
+            # Custom error message without redundancy
+            valid_options = ', '.join([f"'{choice}'" for choice in self.choices])
+            raise typer.completion.click.BadParameter(
+                f"'{value}' is not a valid configuration option.\n"
+                f'Valid options are: {valid_options}'
+            ) from None
+
+
 class ConfigOption(StrEnum):
     @staticmethod
     def _generate_next_value_(name, start, count, last_values):
@@ -22,11 +45,25 @@ class ConfigOption(StrEnum):
         return name.upper()
 
     JIRA_INSTANCE = auto()
+    JIRA_USER = auto()
     # log command
     LT_LOG_ISSUE = auto()
     LT_LOG_START = auto()
     LT_LOG_MESSAGE = auto()
     LT_LOG_DURATION = auto()
+
+
+def complete_config_option(
+    ctx, param: str, incomplete: str
+) -> list[typer.completion.click.shell_completion.CompletionItem]:
+    """Provide shell completion for config options."""
+    return [
+        typer.completion.click.shell_completion.CompletionItem(
+            option.value, help=f'Configuration option: {option.value}'
+        )
+        for option in ConfigOption
+        if option.value.startswith(incomplete.upper())
+    ]
 
 
 def ensure_app_dir_exists():
@@ -56,8 +93,15 @@ def load():
 @app.command(rich_help_panel='Configuration')
 def config(
     key: Annotated[
-        ConfigOption,
-        typer.Argument(help='Read or update this configuration option', show_default=False),
+        str,
+        typer.Argument(
+            help='Read or update this configuration option',
+            show_default=False,
+            shell_complete=complete_config_option,
+            click_type=ConfigOptionChoice(
+                [option.value for option in ConfigOption], case_sensitive=False
+            ),
+        ),
     ] = None,
     value: Annotated[
         str,
@@ -90,6 +134,11 @@ def config(
     ] = False,
 ):
     "Interact with configuration."
+
+    # Convert string key to enum if provided
+    if key is not None:
+        key = ConfigOption(key.upper())
+
     # Determine which configuration files to interact with
     config_files = []
     fp_closest_local_config = find_local_config()
