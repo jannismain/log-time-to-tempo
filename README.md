@@ -65,6 +65,9 @@ lt stats month
 lt stats -v
 ```
 
+The `stats` command now includes sparkline visualizations to show daily time patterns,
+making it easy to see which projects you've been focusing on recently.
+
 ### Check Budget (i.e. logged and remaining time per person)
 
 ```sh
