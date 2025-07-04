@@ -23,11 +23,11 @@ def cache(filename='', days=7):
                 return func(*args, **kwargs)
             spec = inspect.getfullargspec(func)
             default_args = (
-                {k: v for k, v in zip(reversed(spec.args), spec.defaults)}
+                {k: v for k, v in zip(reversed(spec.args), spec.defaults, strict=False)}
                 if spec.defaults is not None
                 else {}
             )
-            given_args = {k: v for k, v in zip(reversed(spec.args), args)}
+            given_args = {k: v for k, v in zip(reversed(spec.args), args, strict=False)}
             filename3 = (
                 Template(filename2).safe_substitute(
                     _get_args_dict(func, args, {**default_args, **given_args, **kwargs})
@@ -70,4 +70,4 @@ def get_caches_for(fn) -> set[Path]:
 
 def _get_args_dict(fn, args, kwargs):
     args_names = fn.__code__.co_varnames[: fn.__code__.co_argcount]
-    return {**dict(zip(args_names, args)), **kwargs}
+    return {**dict(zip(args_names, args, strict=False)), **kwargs}
