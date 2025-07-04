@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "log-time-to-tempo"
 description = 'Log your work time to tempo from the command line.'
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 keywords = ["jira", "tempo", "cli"]
 authors = [
   { name = "Jannis Mainczyk", email = "jannis.mainczyk@codecentric.de" },
@@ -15,6 +15,7 @@ dynamic = ["version"]
 dependencies = [
   "jira",
   "typer",
+  "click>=8.2",
   "rich",
   "python-dotenv",
   "keyring",
