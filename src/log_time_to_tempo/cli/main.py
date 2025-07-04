@@ -244,9 +244,8 @@ def log_time(
 
     if duration_logged + duration > timedelta(hours=10):
         error(
-            f'You already have {
-                _time.format_duration(duration_logged)
-            } logged on that day. Cannot log more than 10h per day.'
+            f'You already have {_time.format_duration(duration_logged)} logged on that day.'
+            ' Cannot log more than 10h per day.'
         )
 
     if yes or typer.confirm('Continue?'):
