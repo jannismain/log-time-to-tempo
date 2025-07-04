@@ -1,5 +1,6 @@
 import os
 import pathlib
+import sys
 from typing import Callable
 
 import pytest
@@ -24,8 +25,18 @@ def cli(caplog, tmp_path, monkeypatch):
     monkeypatch.setattr('log_time_to_tempo.cli.config.fp_config_default', tmp_path / '.lt')
 
     def invoke(*args, **kwargs) -> Result:
-        runner: CliRunner = CliRunner(mix_stderr=False)
-        return runner.invoke(app, *args, **kwargs)
+        runner: CliRunner = CliRunner()
+        result = runner.invoke(app, *args, **kwargs)
+
+        print('----- CLI on stdout')
+        print(result.stdout, end='')
+        print('-----')
+        if result.stderr:
+            print('----- CLI on stderr', file=sys.stderr)
+            print(result.stderr, end='', file=sys.stderr)
+            print('-----', file=sys.stderr)
+
+        return result
 
     previous_directory = pathlib.Path.cwd()
     os.chdir(tmp_path)
