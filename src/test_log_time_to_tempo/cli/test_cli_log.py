@@ -79,7 +79,7 @@ def test_init(log_time):
 
 
 def test_log_when_uninitialized(log_time):
-    result: Result = log_time(['log'], input='12345\n')
+    result: Result = log_time(['log'], input='12345\nN\n')
 
     assert result.exit_code == 0, 'should exit cleanly'
     # should prompt for token on initial run
