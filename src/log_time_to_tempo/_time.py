@@ -63,7 +63,7 @@ def parse_date(value: str | date) -> date:
 def parse_date_dot(value: str) -> date:
     value = value.removesuffix('.')  # 22.2. -> 22.2
     parts = [int(x) for x in value.split('.')]
-    date_args = {k: v for k, v in zip(['day', 'month', 'year'], parts)}
+    date_args = {k: v for k, v in zip(['day', 'month', 'year'], parts, strict=False)}
     if 'year' in date_args and date_args['year'] < 100:
         date_args['year'] += date.today().year // 100 * 100
     return date.today().replace(**date_args)
