@@ -17,8 +17,8 @@ from typing_extensions import Annotated
 
 from .. import __version__, _jira, _time, caching, cfg, name, tempo
 from .._logging import log
-from .._sparkline import generate_sparkline_from_daily_data
 from . import alias, app, config, error, link
+from ._sparkline import generate_sparkline_from_daily_data
 from .completions import complete_issue, complete_project
 
 token_found_in_environment = os.getenv('JIRA_API_TOKEN')
