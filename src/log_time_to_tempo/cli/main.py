@@ -18,6 +18,7 @@ from typing_extensions import Annotated
 from .. import __version__, _jira, _time, caching, cfg, name, tempo
 from .._logging import log
 from . import alias, app, config, error, link
+from ._sparkline import generate_sparkline_from_daily_data
 from .completions import complete_issue, complete_project
 
 token_found_in_environment = os.getenv('JIRA_API_TOKEN')
@@ -353,12 +354,21 @@ def cmd_stats(
         date, typer.Option('--to', parser=_time.parse_date, show_default='today')
     ] = datetime.now().date().strftime('%d.%m'),
     verbose: Annotated[int, typer.Option('-v', count=True)] = 0,
+    show_sparkline: Annotated[
+        bool,
+        typer.Option(
+            '--sparkline/--no-sparkline', is_flag=True, help='toggle sparkline visualization'
+        ),
+    ] = True,
 ):
     """Show logged time per project.
 
+    Projects are displayed with total time spent and optionally a sparkline visualization
+    showing daily time patterns over the selected period.
+
     For a custom time range, use the --from and --to options:
 
-    $ lt list --from 1.12 --to 24.12
+    $ lt stats --from 1.12 --to 24.12
     """
     if from_date is None:
         typer.secho(f'Period: {date_range.value}', bold=True)
@@ -396,11 +406,30 @@ def cmd_stats(
             stats[project]['days'][date]['comments'].add(worklog.comment)
             stats[project]['days'][date]['timeSpentSeconds'] += worklog.timeSpentSeconds
 
+    MAX_COL_WIDTH = 20
+    col_width = min(max(len(p) for p in stats), MAX_COL_WIDTH)
     for project in sorted(stats, key=lambda k: stats[k]['timeSpentSeconds'], reverse=True):
         total_duration = _time.format_duration_aligned(
             timedelta(seconds=stats[project]['timeSpentSeconds'])
         )
-        typer.echo(f'{typer.style(total_duration, bold=True)}  {project}')
+
+        if show_sparkline:
+            sparkline = generate_sparkline_from_daily_data(
+                stats[project]['days'], from_date, to_date
+            )
+
+            # Limit project name width, so that sparkline fits next to it
+            if len(project) > col_width:
+                project_str = project[: col_width - 2] + '..'
+            else:
+                project_str = project.ljust(col_width)
+
+            typer.echo(
+                f'{typer.style(total_duration, bold=True)}  {project_str}  {typer.style(sparkline, fg="cyan")}'
+            )
+        else:
+            typer.echo(f'{typer.style(total_duration, bold=True)}  {project}')
+
         if ctx.obj.verbose > 0 or verbose > 0:
             for date, daily_stats in stats[project]['days'].items():
                 timeSpent = _time.format_duration_aligned(
