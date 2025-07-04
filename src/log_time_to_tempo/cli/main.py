@@ -354,7 +354,12 @@ def cmd_stats(
         date, typer.Option('--to', parser=_time.parse_date, show_default='today')
     ] = datetime.now().date().strftime('%d.%m'),
     verbose: Annotated[int, typer.Option('-v', count=True)] = 0,
-    no_sparkline: Annotated[bool, typer.Option('--no-sparkline', envvar='LT_STATS_NO_SPARKLINE', help='Disable sparkline visualization')] = False,
+    show_sparkline: Annotated[
+        bool,
+        typer.Option(
+            '--sparkline/--no-sparkline', is_flag=True, help='toggle sparkline visualization'
+        ),
+    ] = True,
 ):
     """Show logged time per project.
 
@@ -363,10 +368,7 @@ def cmd_stats(
 
     For a custom time range, use the --from and --to options:
 
-    $ lt list --from 1.12 --to 24.12
-    
-    Use --no-sparkline to disable the sparkline visualization, or set the
-    environment variable LT_STATS_NO_SPARKLINE=1.
+    $ lt stats --from 1.12 --to 24.12
     """
     if from_date is None:
         typer.secho(f'Period: {date_range.value}', bold=True)
@@ -411,17 +413,17 @@ def cmd_stats(
             timedelta(seconds=stats[project]['timeSpentSeconds'])
         )
 
-        # Generate sparkline for this project (if not disabled)
-        sparkline = '' if no_sparkline else generate_sparkline_from_daily_data(stats[project]['days'], from_date, to_date)
+        if show_sparkline:
+            sparkline = generate_sparkline_from_daily_data(
+                stats[project]['days'], from_date, to_date
+            )
 
-        # Display project with sparkline
-        if len(project) > col_width:
-            project_str = project[: col_width - 2] + '..'
-        else:
-            project_str = project.ljust(col_width)
+            # Limit project name width, so that sparkline fits next to it
+            if len(project) > col_width:
+                project_str = project[: col_width - 2] + '..'
+            else:
+                project_str = project.ljust(col_width)
 
-        if sparkline:
-            # Add a subtle visual separator and context
             typer.echo(
                 f'{typer.style(total_duration, bold=True)}  {project_str}  {typer.style(sparkline, fg="cyan")}'
             )
