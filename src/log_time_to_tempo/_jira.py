@@ -65,6 +65,7 @@ class MockIssueFields:
 class MockIssue:
     key: str
     fields: MockIssueFields
+    summary: str
 
 
 class MockClient:
@@ -75,4 +76,4 @@ class MockClient:
         return [MockProject(key='TSI', name='cc Timesheet Internal Tasks')]
 
     def search_issues(self, jql: str, fields: str = ''):
-        return [MockIssue('TSI-7', MockIssueFields('Off-Project Time'))]
+        return [MockIssue('TSI-7', MockIssueFields('Off-Project Time'), 'Off-Project Time')]
