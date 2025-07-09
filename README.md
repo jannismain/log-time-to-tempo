@@ -2,6 +2,7 @@
 
 [![PyPI - Version](https://img.shields.io/pypi/v/log-time-to-tempo.svg)](https://pypi.org/project/log-time-to-tempo)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/log-time-to-tempo.svg)](https://pypi.org/project/log-time-to-tempo)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/jannismain/log-time-to-tempo)
 
 -----
 
