@@ -57,7 +57,7 @@ def test_cache_custom_name(mock):
 
 
 @caching.cache('hello-$name')
-def hello(name='World', **kwargs):
+def hello(name='world', **kwargs):
     return f'Hello, {name.title()}!'
 
 
