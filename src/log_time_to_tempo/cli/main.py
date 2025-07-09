@@ -415,7 +415,7 @@ def cmd_stats(
 
         if show_sparkline:
             sparkline = generate_sparkline_from_daily_data(
-                stats[project]['days'], from_date, to_date
+                stats[project]['days'], from_date, to_date, maximum=8
             )
 
             # Limit project name width, so that sparkline fits next to it
