@@ -6,6 +6,7 @@ from dataclasses import dataclass
 import pytest
 
 import log_time_to_tempo.caching as caching
+from log_time_to_tempo._logging import log
 
 
 @dataclass
@@ -13,6 +14,7 @@ class MockCache:
     cache_dir: pathlib.Path
 
     def load_cache(self, fn):
+        log.debug('cached: %s', ','.join(p.name for p in self.cache_dir.glob('*')))
         return pickle.load((self.cache_dir / fn).open('rb'))
 
 
