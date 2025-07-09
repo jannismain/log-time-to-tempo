@@ -1,0 +1,28 @@
+stages:
+  - lint
+  - test
+
+lint:
+  stage: lint
+  image: python:3.13
+  before_script:
+    - python -m pip install --upgrade pip
+    - pip install hatch
+  script:
+    - hatch run ruff check .
+    - hatch run ruff format --check .
+
+test:
+  stage: test
+  image: python:${PYTHON_VERSION}
+  parallel:
+    matrix:
+      - PYTHON_VERSION: ["3.11", "3.12", "3.13"]
+  before_script:
+    - python -m pip install --upgrade pip
+    - pip install hatch
+  script:
+    - hatch run test:test
+  artifacts:
+    paths:
+      - coverage.xml
