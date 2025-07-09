@@ -57,7 +57,8 @@ lt = "log_time_to_tempo.cli.main:app"
 path = "src/log_time_to_tempo/__init__.py"
 
 [tool.hatch.envs.default]
-dependencies = ["ruff"]
+installer = "uv"
+
 [tool.hatch.envs.default.scripts]
 test = "hatch run test:test"
 release = "hatch run test:release"
@@ -126,3 +127,7 @@ quote-style = "single"
 
 [tool.ruff.lint.isort]
 known-first-party = ["log_time_to_tempo", "test_log_time_to_tempo"]
+
+[tool.uv]
+managed = true
+package = true
