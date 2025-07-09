@@ -48,6 +48,7 @@ Issues = "https://github.com/jannismain/log-time-to-tempo/issues"
 Source = "https://github.com/jannismain/log-time-to-tempo"
 
 [project.scripts]
+log-time-to-tempo = "log_time_to_tempo.cli.main:app"
 log-time = "log_time_to_tempo.cli.main:app"
 lt = "log_time_to_tempo.cli.main:app"
 
