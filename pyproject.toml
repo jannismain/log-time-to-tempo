@@ -57,6 +57,7 @@ lt = "log_time_to_tempo.cli.main:app"
 path = "src/log_time_to_tempo/__init__.py"
 
 [tool.hatch.envs.default]
+dependencies = ["ruff"]
 installer = "uv"
 
 [tool.hatch.envs.default.scripts]
