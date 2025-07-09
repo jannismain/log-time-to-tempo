@@ -29,9 +29,10 @@ def generate_sparkline_from_daily_data(
     current_date = from_date
 
     while current_date <= to_date:
-        date_str = current_date.strftime('%d.%m')
-        time_spent = daily_data.get(date_str, {}).get('timeSpentSeconds', 0)
-        daily_values.append(time_spent)
+        if current_date.weekday() < 5:  # skip weekends
+            date_str = current_date.strftime('%d.%m')
+            time_spent = daily_data.get(date_str, {}).get('timeSpentSeconds', 0)
+            daily_values.append(time_spent)
         current_date += timedelta(days=1)
 
     if not daily_values or all(v == 0 for v in daily_values):
