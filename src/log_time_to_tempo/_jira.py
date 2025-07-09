@@ -65,7 +65,7 @@ class MockIssueFields:
 class MockIssue:
     key: str
     fields: MockIssueFields
-    summary: str
+    summary: str = ''
 
 
 class MockClient:
