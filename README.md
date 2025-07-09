@@ -113,6 +113,10 @@ lt config --unset
 <!-- ### [0.0.X] - 202X-XX-XX
 [0.0.X]: https://github.com/jannismain/log-time-to-tempo/releases/tag/v0.0.X -->
 
+### [0.0.8] - 2025-07-09
+
+[0.0.8]: https://github.com/jannismain/log-time-to-tempo/releases/tag/v0.0.8
+
 - `stats` command includes sparkline visualizations to show daily time patterns, making it easy to see which projects you've been focusing on recently
 - `budget` command shows logged and remaining hours for a given issue
 - fix redundant display of configuration options in `config` command error messages
