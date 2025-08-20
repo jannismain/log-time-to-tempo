@@ -362,8 +362,9 @@ def cmd_stats(
 ):
     """Show logged time per project.
 
-    Projects are displayed with total time spent and optionally a sparkline visualization
-    showing daily time patterns over the selected period.
+    Projects are displayed with total time spent and optionally a
+    sparkline visualization showing daily time patterns over the
+    selected period.
 
     For a custom time range, use the --from and --to options:
 
@@ -468,9 +469,38 @@ def issues(
 @app.command(rich_help_panel='GET')
 def budget(
     ctx: typer.Context,
-    issue: Annotated[str, typer.Argument(envvar='JIRA_ISSUE', shell_complete=complete_issue)] = '*',
+    issue: Annotated[
+        str,
+        typer.Argument(
+            envvar='JIRA_ISSUE', shell_complete=complete_issue, show_default='last booked on'
+        ),
+    ] = '*',
 ):
     "List issues"
+    # If no issue is specified, automatically select the last booked issue
+    if issue == '*':
+        # Get recent worklogs to find the last booked issue
+        # Look back up to 30 days to find the most recent worklog
+        from_date = datetime.now().date() - timedelta(days=30)
+        to_date = datetime.now().date()
+        recent_worklogs = tempo.get_worklogs(ctx.obj.myself['key'], from_date, to_date)
+
+        if not recent_worklogs:
+            error('No recent worklogs found. Please specify an issue.')
+
+        # Sort worklogs by start time to get the most recent one
+        most_recent_worklog = max(recent_worklogs, key=lambda w: w.started)
+        issue = most_recent_worklog.issue.key
+
+        # Check if there's an alias for the selected issue
+        alias_for_issue = next(
+            (alias for alias, issue_key in ctx.obj.aliases.items() if issue_key == issue), None
+        )
+        if alias_for_issue:
+            rich.print(f'[dim]Using last booked issue: {issue} (alias: {alias_for_issue})[/dim]')
+        else:
+            rich.print(f'[dim]Using last booked issue: {issue}[/dim]')
+
     if issue in ctx.obj.aliases.values():
         issue = next(k for k, v in ctx.obj.aliases.items() if v == issue)
 

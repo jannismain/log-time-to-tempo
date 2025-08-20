@@ -69,7 +69,9 @@ lt stats -v
 ### Check Budget (i.e. logged and remaining time per person)
 
 ```sh
-# show remaining time
+# show remaining time for last booked issue (auto-selected)
+lt budget
+# show remaining time for specific issue
 lt budget TS-XXXXX
 ```
 
@@ -113,6 +115,8 @@ lt config --unset
 
 <!-- ### [0.0.X] - 202X-XX-XX
 [0.0.X]: https://github.com/jannismain/log-time-to-tempo/releases/tag/v0.0.X -->
+
+- `budget` command automatically selects the most recent issue when no issue is specified
 
 ### [0.0.8] - 2025-07-09
 
