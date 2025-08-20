@@ -159,18 +159,25 @@ def log_time(
     if ctx.resilient_parsing:  # script is running for completion purposes
         return
     cfg = ctx.obj
-    if issue in ctx.obj.aliases.values():
-        issue = next(k for k, v in ctx.obj.aliases.items() if v == issue)
+
+    # resolve issue alias
+    alias = ''
+    if issue in ctx.obj.aliases:
+        alias = issue
+        issue = ctx.obj.aliases[alias]
+    else:
+        if issue in ctx.obj.aliases.values():
+            alias = next(key for key, value in ctx.obj.aliases.items() if value == issue)
 
     try:
         cfg.issue = cfg.jira.issue(issue, fields='summary,comment')
     except jira.JIRAError as e:
         # If not issue is found, try to figure out what the user meant
-        fuzzy_matches = set(get_close_matches(issue, ctx.obj.aliases.values(), n=5, cutoff=0.6))
+        fuzzy_matches = set(get_close_matches(issue, ctx.obj.aliases.keys(), n=5, cutoff=0.6))
         similar_issues = {
-            value: f'alias for {key}'
-            for key, value in ctx.obj.aliases.items()
-            if value in fuzzy_matches
+            issue: f'alias for {alias}'
+            for alias, issue in ctx.obj.aliases.items()
+            if alias in fuzzy_matches
         }
 
         # Also check jira issue summaries for matches
@@ -204,7 +211,7 @@ def log_time(
         if similar_issues and len(similar_issues) > 1:
             typer.secho(f'Did you mean: {", ".join(similar_issues)}', fg='red', italic=True)
         return
-    description = get_project_description(ctx, cfg.issue)
+    project_name = get_project_name(ctx, cfg.issue)
 
     worklogs = tempo.get_worklogs(ctx.obj.myself['key'], day, day)
     seconds_logged = sum(worklog.timeSpentSeconds for worklog in worklogs)
@@ -238,7 +245,7 @@ def log_time(
         'Log',
         _time.format_duration(duration),
         f'({start.strftime("%H:%M")} - {end.strftime("%H:%M")})',
-        f'as [italic]{cfg.issue.fields.summary} ({description})[/italic]',
+        f'on [italic]{project_name + " (" + (f"{cfg.issue.key}: " if project_name == alias else "")}{cfg.issue.fields.summary})[/italic]',
         f'for {_time.format_date_relative(day)}',
     )
 
@@ -332,7 +339,7 @@ def cmd_list(
             else '',
             worklog.started.strftime('%H:%M'),
             _time.format_duration_aligned(timedelta(seconds=worklog.timeSpentSeconds), 2),
-            get_project_description(ctx, worklog.issue),
+            get_project_name(ctx, worklog.issue),
             worklog.issue.key,
             worklog.comment or '',
         )
@@ -385,7 +392,7 @@ def cmd_stats(
 
     stats = {}
     for worklog in tempo.get_worklogs(ctx.obj.myself['key'], from_date, to_date):
-        project = get_project_description(ctx, worklog.issue)
+        project = get_project_name(ctx, worklog.issue)
         if project not in stats:
             stats[project] = {
                 'timeSpentSeconds': 0,
@@ -501,8 +508,8 @@ def budget(
         else:
             rich.print(f'[dim]Using last booked issue: {issue}[/dim]')
 
-    if issue in ctx.obj.aliases.values():
-        issue = next(k for k, v in ctx.obj.aliases.items() if v == issue)
+    if issue in ctx.obj.aliases:
+        issue = ctx.obj.aliases[issue]
 
     try:
         issue = ctx.obj.jira.issue(issue)
@@ -639,12 +646,11 @@ def debug(ctx: typer.Context):
     typer.echo(ctx.obj)
 
 
-def get_project_description(ctx, issue):
-    if alias := ctx.obj.aliases.get(issue.key):
-        return alias
-    if isinstance(issue, jira.Issue):
-        return issue.key
-    return issue.summary
+def get_project_name(ctx, issue):
+    if issue.key in ctx.obj.aliases.values():
+        project_alias = next(key for key, value in ctx.obj.aliases.items() if value == issue.key)
+        return project_alias
+    return issue.key
 
 
 if __name__ == '__main__':
