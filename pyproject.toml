@@ -132,3 +132,6 @@ known-first-party = ["log_time_to_tempo", "test_log_time_to_tempo"]
 [tool.uv]
 managed = true
 package = true
+
+[tool.docformatter]
+wrap-summaries = 100

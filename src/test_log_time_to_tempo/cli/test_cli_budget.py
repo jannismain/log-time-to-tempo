@@ -110,8 +110,7 @@ def test_budget_with_specific_issue(mock_jira, mock_keyring, mock_tempo_with_wor
 
 
 def test_budget_auto_select_last_issue(mock_jira, mock_keyring, mock_tempo_with_worklogs):
-    """Test budget command automatically selects last booked issue when none
-    provided."""
+    """Test budget command automatically selects last booked issue when none provided."""
     runner = CliRunner()
     result = runner.invoke(app, ['budget'], input='test-token\n')
 

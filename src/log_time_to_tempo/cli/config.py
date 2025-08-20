@@ -16,7 +16,10 @@ fp_config_default = app_dir / filename
 
 
 class ConfigOptionChoice(typer.completion.click.Choice):
-    """Custom Choice type that hides enum options from usage line but provides clear error messages."""
+    """Custom Choice type that hides enum options from usage line.
+
+    This provides a more clear error message.
+    """
 
     def __init__(self, choices, case_sensitive=True):
         super().__init__(choices, case_sensitive)
