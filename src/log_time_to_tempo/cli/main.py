@@ -422,7 +422,7 @@ def cmd_stats(
 
         if show_sparkline:
             sparkline = generate_sparkline_from_daily_data(
-                stats[project]['days'], from_date, to_date, maximum=8
+                stats[project]['days'], from_date, to_date, maximum=8, minimum=0
             )
 
             # Limit project name width, so that sparkline fits next to it
@@ -431,19 +431,23 @@ def cmd_stats(
             else:
                 project_str = project.ljust(col_width)
 
-            typer.echo(
-                f'{typer.style(total_duration, bold=True)}  {project_str}  {typer.style(sparkline, fg="cyan")}'
+            typer.secho(
+                f'{total_duration}  {project_str}  {typer.style(sparkline, fg="cyan")}',
+                bold=True,
             )
         else:
-            typer.echo(f'{typer.style(total_duration, bold=True)}  {project}')
+            typer.secho(f'{total_duration}  {project}', bold=True)
 
         if ctx.obj.verbose > 0 or verbose > 0:
             for date, daily_stats in stats[project]['days'].items():
                 timeSpent = _time.format_duration_aligned(
                     timedelta(seconds=daily_stats['timeSpentSeconds'])
                 )
-                typer.echo(f'          {date}: {timeSpent} - , '.join(daily_stats['comments']))
-    typer.secho('-' * 20)
+                typer.secho(
+                    f'          {date} {timeSpent}  ' + '; '.join(daily_stats['comments']),
+                    dim=True,
+                )
+    typer.echo('-' * 15)
     total_duration = _time.format_duration_aligned(
         timedelta(seconds=sum(project['timeSpentSeconds'] for project in stats.values()))
     )

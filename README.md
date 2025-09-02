@@ -6,7 +6,7 @@
 
 -----
 
-Log your time to tempo on a self-hosted Jira instance from the convenience of your command line.
+Log your time to tempo on a self-hosted Jira instance and get relevant insights into your logged time per project from the convenience of your command line.
 
 ## Requirements
 
@@ -117,6 +117,7 @@ lt config --unset
 [0.0.X]: https://github.com/jannismain/log-time-to-tempo/releases/tag/v0.0.X -->
 
 - `budget` command automatically selects the most recent issue when no issue is specified
+- fix output of `stats -v` command (dim worklog comments, show day/time correctly, normalize sparkline height to 0-8)
 
 ### [0.0.8] - 2025-07-09
 
