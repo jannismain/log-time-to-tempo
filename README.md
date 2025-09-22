@@ -66,6 +66,11 @@ lt stats month
 lt stats -v
 ```
 
+The `stats` command includes sparkline visualizations with axis information to help you understand when you started logging time for each project:
+- **Yearly ranges** (e.g., `year`, `last_year`): Show month abbreviations (Jan, Feb, Mar, ...)
+- **Monthly ranges** (e.g., `month`, `last_30_days`): Show week numbers (W1, W2, W3, ...)  
+- **Weekly ranges** (e.g., `week`, `last_7_days`): Show no axis labels to reduce clutter
+
 ### Check Budget (i.e. logged and remaining time per person)
 
 ```sh
