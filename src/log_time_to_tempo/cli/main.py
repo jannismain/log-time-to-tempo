@@ -18,7 +18,7 @@ from typing_extensions import Annotated
 from .. import __version__, _jira, _time, caching, cfg, name, tempo
 from .._logging import log
 from . import alias, app, config, error, link
-from ._sparkline import generate_sparkline_from_daily_data
+from ._sparkline import generate_sparkline_from_daily_data, determine_date_range_type, generate_axis_labels
 from .completions import complete_issue, complete_project
 
 token_found_in_environment = os.getenv('JIRA_API_TOKEN')
@@ -421,6 +421,13 @@ def cmd_stats(
 
     MAX_COL_WIDTH = 20
     col_width = min(max((len(p) for p in stats), default=0), MAX_COL_WIDTH)
+    
+    # Determine date range type and generate axis labels if sparkline is shown
+    axis_labels = ''
+    if show_sparkline and stats:
+        range_type = determine_date_range_type(from_date, to_date)
+        axis_labels = generate_axis_labels(from_date, to_date, range_type)
+    
     for project in sorted(stats, key=lambda k: stats[k]['timeSpentSeconds'], reverse=True):
         total_duration = _time.format_duration_aligned(
             timedelta(seconds=stats[project]['timeSpentSeconds'])
@@ -453,6 +460,13 @@ def cmd_stats(
                     f'          {date} {timeSpent}  ' + '; '.join(daily_stats['comments']),
                     dim=True,
                 )
+    
+    # Display axis labels if available
+    if axis_labels and show_sparkline:
+        # Create spacing to align with sparkline
+        spacing = ' ' * (len('999h') + 2 + col_width + 2)  # duration + project + spaces
+        typer.secho(f'{spacing}{axis_labels}', dim=True)
+    
     typer.echo('-' * 15)
     total_duration = _time.format_duration_aligned(
         timedelta(seconds=sum(project['timeSpentSeconds'] for project in stats.values()))
