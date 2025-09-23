@@ -68,6 +68,12 @@ def main(
     """Log time to tempo."""
     if ctx.resilient_parsing:  # script is running for completion purposes, nocov
         return
+
+    # If no subcommand is provided, show help and exit cleanly
+    if ctx.invoked_subcommand is None:
+        print(ctx.get_help())
+        ctx.exit(0)
+
     ctx.obj = cfg  # make the config object available to subcommands
     if verbose:
         import coloredlogs
