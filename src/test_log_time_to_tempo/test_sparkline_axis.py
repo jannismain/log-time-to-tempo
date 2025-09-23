@@ -2,12 +2,10 @@
 
 from datetime import date, timedelta
 
-import pytest
-
 from log_time_to_tempo.cli._sparkline import (
     determine_date_range_type,
     generate_axis_labels,
-    generate_sparkline_from_daily_data
+    generate_sparkline_from_daily_data,
 )
 
 
@@ -38,22 +36,22 @@ class TestDateRangeType:
     def test_edge_cases(self):
         """Test edge cases for range type determination."""
         today = date.today()
-        
+
         # Exactly 14 days should be weekly
         from_date = today - timedelta(days=13)
         to_date = today
         assert determine_date_range_type(from_date, to_date) == 'weekly'
-        
+
         # 15 days should be monthly
         from_date = today - timedelta(days=14)
         to_date = today
         assert determine_date_range_type(from_date, to_date) == 'monthly'
-        
+
         # 60 days should be monthly
         from_date = today - timedelta(days=59)
         to_date = today
         assert determine_date_range_type(from_date, to_date) == 'monthly'
-        
+
         # 61 days should be yearly
         from_date = today - timedelta(days=60)
         to_date = today
@@ -86,8 +84,23 @@ class TestAxisLabels:
         from_date = today.replace(month=1, day=1)
         to_date = today
         labels = generate_axis_labels(from_date, to_date, 'yearly')
-        assert any(month in labels for month in ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                                                'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
+        assert any(
+            month in labels
+            for month in [
+                'Jan',
+                'Feb',
+                'Mar',
+                'Apr',
+                'May',
+                'Jun',
+                'Jul',
+                'Aug',
+                'Sep',
+                'Oct',
+                'Nov',
+                'Dec',
+            ]
+        )
 
     def test_axis_labels_length_matches_workdays(self):
         """Test that axis labels align with workdays in range."""
@@ -97,9 +110,9 @@ class TestAxisLabels:
         days_since_monday = today.weekday()
         monday = today - timedelta(days=days_since_monday)
         friday = monday + timedelta(days=4)
-        
+
         labels = generate_axis_labels(monday, friday, 'monthly')
-        
+
         # Count workdays in the range
         workdays = 0
         current = monday
@@ -107,7 +120,7 @@ class TestAxisLabels:
             if current.weekday() < 5:
                 workdays += 1
             current += timedelta(days=1)
-        
+
         # Axis labels should not exceed the number of workdays
         assert len(labels.rstrip()) <= workdays
 
@@ -118,10 +131,10 @@ class TestAxisLabels:
         # Find a Saturday
         while today.weekday() != 5:  # 5 = Saturday
             today += timedelta(days=1)
-        
+
         saturday = today
         sunday = saturday + timedelta(days=1)
-        
+
         labels = generate_axis_labels(saturday, sunday, 'monthly')
         assert labels == ''
 
@@ -137,12 +150,12 @@ class TestSparklineIntegration:
             '02.01': {'timeSpentSeconds': 6 * 3600},  # 6 hours
             '03.01': {'timeSpentSeconds': 4 * 3600},  # 4 hours
         }
-        
+
         from_date = date(2024, 1, 1)  # Monday
-        to_date = date(2024, 1, 3)    # Wednesday
-        
+        to_date = date(2024, 1, 3)  # Wednesday
+
         sparkline = generate_sparkline_from_daily_data(daily_data, from_date, to_date)
-        
+
         # Should generate a 3-character sparkline (3 workdays)
         assert len(sparkline) == 3
         assert sparkline != ''
