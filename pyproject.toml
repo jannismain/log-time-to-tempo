@@ -56,47 +56,8 @@ lt = "log_time_to_tempo.cli.main:app"
 [tool.hatch.version]
 path = "src/log_time_to_tempo/__init__.py"
 
-[tool.hatch.envs.default]
-dependencies = ["ruff"]
-installer = "uv"
-
-[tool.hatch.envs.default.scripts]
-test = "hatch run test:test"
-release = "hatch run test:release"
-publish = "hatch run test:publish"
-build = "hatch run build:build"
-
-[tool.hatch.envs.test]
-dependencies = ["pytest", "pytest-cov", "hypothesis", "hatchling"]
-[tool.hatch.envs.test.scripts]
-test = "pytest --cov-config=pyproject.toml --cov-report=term --cov-report html:build/coverage --cov=log_time_to_tempo --cov-report xml"
-release = """\
-hatch run test:test
-echo "Forgot anything? Press CTRL+C to abort..."
-sleep 5
-git tag -m 'bump version to '`hatch version` v`hatch version` --sign
-git push --tags
-rm -rf dist/log_time_to_tempo-*
-hatch run build:build
-hatch run test:publish
-"""
-publish = """\
-hatch publish
-glab release create v`hatch version` \
-    --name v`hatch version` \
-    --notes '*[see changes](https://gitlab.codecentric.de/jmm/log-time-to-tempo/-/blob/main/README.md#'`hatch version | tr -d .`'-'`date -Idate`')*' \
-    dist/*
-gh release create v`hatch version` \
-    --title v`hatch version` \
-    --notes '*[see changes](https://github.com/jannismain/log-time-to-tempo/blob/main/README.md#'`hatch version | tr -d .`'---'`date -Idate`')*' \
-    dist/*
-"""
-[tool.hatch.envs.build]
-dependencies = ["hatchling"]
-[tool.hatch.envs.build.scripts]
-build = """\
-hatch build --clean
-"""
+[dependency-groups]
+dev = ["ruff", "pytest", "pytest-cov", "hypothesis", "hatchling"]
 
 [tool.coverage.run]
 source_pkgs = ["log_time_to_tempo", "tests"]
