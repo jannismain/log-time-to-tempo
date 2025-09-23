@@ -420,7 +420,7 @@ def cmd_stats(
             stats[project]['days'][date]['timeSpentSeconds'] += worklog.timeSpentSeconds
 
     MAX_COL_WIDTH = 20
-    col_width = min(max(len(p) for p in stats), MAX_COL_WIDTH)
+    col_width = min(max((len(p) for p in stats), default=0), MAX_COL_WIDTH)
     for project in sorted(stats, key=lambda k: stats[k]['timeSpentSeconds'], reverse=True):
         total_duration = _time.format_duration_aligned(
             timedelta(seconds=stats[project]['timeSpentSeconds'])
