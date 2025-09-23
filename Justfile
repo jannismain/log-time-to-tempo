@@ -3,11 +3,13 @@
 
 # fix linter issues and auto-format code
 fix:
-    uv run ruff check --fix . && uv run ruff format .
+    uv run ruff check --fix . && uv run ruff format . && uv run docformatter --in-place --config pyproject.toml src/**/*.py
 
 # check for linter issues and verify code formatting
 lint:
-    uv run ruff check . && uv run ruff format --check .
+    uv run ruff check .
+    uv run ruff format --check .
+    uv run docformatter --config pyproject.toml --check src/**/*.py
 
 # run tests
 test:

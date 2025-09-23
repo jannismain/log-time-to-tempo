@@ -40,8 +40,16 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 license-files = ["./LICENSE"]
-[project.optional-dependencies]
-test = ["pytest", "pytest-cov", "hypothesis", "ruff"]
+
+[dependency-groups]
+dev = [
+  "ruff",
+  "pytest",
+  "pytest-cov",
+  "hypothesis",
+  "hatchling",
+  "docformatter",
+]
 
 [project.urls]
 Documentation = "https://github.com/jannismain/log-time-to-tempo#readme"
@@ -56,8 +64,6 @@ lt = "log_time_to_tempo.cli.main:app"
 [tool.hatch.version]
 path = "src/log_time_to_tempo/__init__.py"
 
-[dependency-groups]
-dev = ["ruff", "pytest", "pytest-cov", "hypothesis", "hatchling"]
 
 [tool.coverage.run]
 source_pkgs = ["log_time_to_tempo", "tests"]
