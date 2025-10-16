@@ -59,11 +59,11 @@ def determine_date_range_type(from_date: date, to_date: date) -> str:
     """
     duration = (to_date - from_date).days
 
-    # If the range spans multiple months or more than 60 days, consider it yearly
-    if duration > 60 or (from_date.month != to_date.month and duration > 30):
+    # If the range spans more than 60 days, consider it yearly
+    if duration >= 60:
         return 'yearly'
-    # If the range spans more than 2 weeks but less than ~60 days, consider it monthly
-    elif duration > 14:
+    # If the range spans more than 2 weeks but less than 60 days, consider it monthly
+    elif duration >= 14:
         return 'monthly'
     # Otherwise, consider it weekly (no axis needed)
     else:
