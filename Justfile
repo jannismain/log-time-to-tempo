@@ -12,12 +12,12 @@ lint:
     uv run docformatter --config pyproject.toml --check src/**/*.py
 
 # run tests
-test:
-    uv run pytest
+test *args:
+    uv run pytest {{ args }}
 
 # run tests and collect coverage data
-cov:
-    uv run pytest --cov-config=pyproject.toml --cov-report=term --cov-report html:build/coverage --cov=log_time_to_tempo --cov-report xml
+cov *args:
+    uv run pytest --cov-config=pyproject.toml --cov-report=term --cov-report html:build/coverage --cov=log_time_to_tempo --cov-report xml {{ args }}
 
 # build distributable packages
 build:
