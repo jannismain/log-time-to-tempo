@@ -122,6 +122,10 @@ lt config --unset
 <!-- ### [0.0.X] - 202X-XX-XX
 [0.0.X]: https://github.com/jannismain/log-time-to-tempo/releases/tag/v0.0.X -->
 
+### [0.0.9] - 2025-10-22
+
+[0.0.9]: https://github.com/jannismain/log-time-to-tempo/releases/tag/v0.0.9
+
 - add axis to `stats` sparklines to indicate time periods
 - `budget` command automatically selects the most recent issue when no issue is specified
 - fix output of `stats -v` command (dim worklog comments, show day/time correctly, normalize sparkline height to 0-8)
