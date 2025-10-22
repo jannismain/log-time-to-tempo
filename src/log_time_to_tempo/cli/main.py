@@ -364,7 +364,7 @@ def cmd_list(
 @app.command('stats', rich_help_panel='GET')
 def cmd_stats(
     ctx: typer.Context,
-    date_range: Annotated[str, arg_relative_date_range] = 'week',
+    date_range: Annotated[str, arg_relative_date_range] = 'month',
     from_date: Annotated[Optional[date], typer.Option('--from', parser=_time.parse_date)] = None,
     to_date: Annotated[
         date, typer.Option('--to', parser=_time.parse_date, show_default='today')
@@ -425,6 +425,8 @@ def cmd_stats(
 
     MAX_COL_WIDTH = 20
     col_width = min(max((len(p) for p in stats), default=0), MAX_COL_WIDTH)
+    if col_width < 5:  # ensure that 'Total' on last line fits as well
+        col_width = 5
 
     # Determine date range type and generate axis labels if sparkline is shown
     axis_labels = ''
@@ -473,7 +475,7 @@ def cmd_stats(
         total_str = 'Total'.ljust(col_width)
         typer.echo(
             typer.style(f'{total_duration}  {total_str}', bold=True)
-            + typer.style(f' {axis_labels}', dim=True)
+            + typer.style(f'  {axis_labels}', dim=True)
         )
     else:
         typer.secho(f'{total_duration}  Total', bold=True)

@@ -75,8 +75,10 @@ class TestAxisLabels:
         from_date = today - timedelta(days=29)
         to_date = today
         labels = generate_axis_labels(from_date, to_date, 'monthly')
-        assert 'W1' in labels
+        # Verify week labels are present (format: W followed by week number)
         assert 'W' in labels
+        # Verify tickmarks are present for week labels
+        assert '⎸' in labels
 
     def test_yearly_axis_has_months(self):
         """Test that yearly ranges return month labels."""
@@ -101,6 +103,8 @@ class TestAxisLabels:
                 'Dec',
             ]
         )
+        # Verify tickmarks are present for month labels
+        assert '⎸' in labels
 
     def test_axis_labels_length_matches_workdays(self):
         """Test that axis labels align with workdays in range."""
@@ -122,7 +126,7 @@ class TestAxisLabels:
             current += timedelta(days=1)
 
         # Axis labels should not exceed the number of workdays
-        assert len(labels.rstrip()) <= workdays
+        assert len(labels) <= workdays
 
     def test_no_workdays_returns_empty(self):
         """Test that ranges with no workdays return empty labels."""
@@ -137,6 +141,61 @@ class TestAxisLabels:
 
         labels = generate_axis_labels(saturday, sunday, 'monthly')
         assert labels == ''
+
+    def test_axis_labels_dont_overflow(self):
+        """Test that axis labels don't overflow the sparkline width."""
+        # Create a very short range that would cause label cutoff
+        from_date = date(2024, 10, 21)  # Monday
+        to_date = date(2024, 10, 25)  # Friday (5 workdays)
+
+        labels = generate_axis_labels(from_date, to_date, 'monthly')
+
+        # Should have tickmark but no label text if it doesn't fit
+        # The range is only 5 characters wide, so W43 (3 chars) + tickmark (1 char) = 4 chars
+        # This should fit, but let's verify the length constraint
+        assert len(labels) <= 5  # 5 workdays in the range
+
+        # Create an even shorter range that would definitely cause cutoff
+        from_date = date(2024, 10, 21)  # Monday
+        to_date = date(2024, 10, 22)  # Tuesday (2 workdays)
+
+        labels = generate_axis_labels(from_date, to_date, 'monthly')
+
+        # Should have tickmark but no label text since W43 doesn't fit in 2 chars
+        assert len(labels) <= 2  # 2 workdays in the range
+
+    def test_axis_labels_align_with_sparkline(self):
+        """Test that axis labels align properly with sparkline positions."""
+        # Create a range that starts on Monday and spans multiple weeks
+        from_date = date(2024, 10, 21)  # Monday
+        to_date = date(2024, 11, 1)  # Friday (3 weeks)
+
+        # Generate axis labels
+        labels = generate_axis_labels(from_date, to_date, 'monthly')
+
+        # Generate sparkline for the same range
+        daily_data = {
+            '21.10': {'timeSpentSeconds': 8 * 3600},
+            '22.10': {'timeSpentSeconds': 6 * 3600},
+            '23.10': {'timeSpentSeconds': 7 * 3600},
+            '24.10': {'timeSpentSeconds': 8 * 3600},
+            '25.10': {'timeSpentSeconds': 6 * 3600},
+            '28.10': {'timeSpentSeconds': 7 * 3600},  # Monday of week 2
+            '29.10': {'timeSpentSeconds': 8 * 3600},
+            '30.10': {'timeSpentSeconds': 6 * 3600},
+            '31.10': {'timeSpentSeconds': 7 * 3600},
+            '01.11': {'timeSpentSeconds': 8 * 3600},  # Friday of week 3
+        }
+        sparkline = generate_sparkline_from_daily_data(daily_data, from_date, to_date)
+
+        # Both should have the same length (number of workdays)
+        assert len(sparkline) == len(labels)
+
+        # Check that tickmarks align with week boundaries
+        # The first tickmark should be at position 0 (first Monday)
+        assert labels[0] == '⎸'
+        # The second tickmark should be at position 5 (second Monday, after 5 workdays)
+        assert labels[5] == '⎸'
 
 
 class TestSparklineIntegration:

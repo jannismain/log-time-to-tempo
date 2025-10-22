@@ -113,10 +113,6 @@ def generate_axis_labels(from_date: date, to_date: date, range_type: str) -> str
         # But space them out so they don't overlap
         months_to_show = list(month_positions.keys())
 
-        # If we have many months, show every other one to avoid crowding
-        if len(months_to_show) > 6:
-            months_to_show = months_to_show[::2]
-
         for month in months_to_show:
             pos = month_positions[month]
             # Only place if there's room (avoid overlapping with previous labels)
@@ -129,28 +125,34 @@ def generate_axis_labels(from_date: date, to_date: date, range_type: str) -> str
                         break
 
                 if space_available:
-                    # Place the month label
-                    for j, char in enumerate(month):
-                        if pos + j < sparkline_width:
-                            axis_chars[pos + j] = char
+                    # Add tickmark at the label position
+                    axis_chars[pos] = '⎸'
+                    # Place the month label only if there's room for the entire label
+                    if pos + len(month) < sparkline_width:
+                        for j, char in enumerate(month):
+                            if pos + j + 1 < sparkline_width:
+                                axis_chars[pos + j + 1] = char
 
-        return ''.join(axis_chars).rstrip()
+        return ''.join(axis_chars)
 
     elif range_type == 'monthly':
         # Generate week labels at the start of each week
         axis_chars = [' '] * sparkline_width
-        week_num = 1
 
         for i, day in enumerate(workdays):
             # Mark start of each week (Monday)
             if day.weekday() == 0:  # Monday
+                # Get actual ISO week number
+                week_num = day.isocalendar()[1]
                 week_label = f'W{week_num}'
-                # Place week label if there's room
-                for j, char in enumerate(week_label):
-                    if i + j < sparkline_width:
-                        axis_chars[i + j] = char
-                week_num += 1
+                # Add tickmark at the label position
+                axis_chars[i] = '⎸'
+                # Place week label only if there's room for the entire label
+                if i + len(week_label) < sparkline_width:
+                    for j, char in enumerate(week_label):
+                        if i + j + 1 < sparkline_width:
+                            axis_chars[i + j + 1] = char
 
-        return ''.join(axis_chars).rstrip()
+        return ''.join(axis_chars)
 
     return ''
