@@ -9,8 +9,8 @@ from rich.table import Table
 from simple_term_menu import TerminalMenu
 from typer import Context
 
-from .. import _jira
-from . import app, app_dir
+from ... import _jira
+from .. import app, app_dir
 
 fp_project_aliases = app_dir / 'aliases'
 

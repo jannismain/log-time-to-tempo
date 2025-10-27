@@ -52,5 +52,8 @@ ENV/
 env.bak/
 venv.bak/
 
+# Resources
+logo*.png
+
 # Configuration
 .lt

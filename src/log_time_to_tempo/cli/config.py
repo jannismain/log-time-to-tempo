@@ -1,15 +1,11 @@
 import pathlib
 from enum import StrEnum, auto
-from typing import Annotated
 
-import dotenv
-import rich
 import typer
 from dotenv import dotenv_values, find_dotenv, load_dotenv
 
 from .. import name
-from .._logging import log
-from . import app, app_dir, link
+from . import app_dir
 
 filename = f'.{name}'
 fp_config_default = app_dir / filename
@@ -91,111 +87,6 @@ def load():
     ensure_app_dir_exists()
     load_local_config()
     load_dotenv(fp_config_default, override=False)
-
-
-@app.command(rich_help_panel='Configuration')
-def config(
-    key: Annotated[
-        str,
-        typer.Argument(
-            help='Read or update this configuration option',
-            show_default=False,
-            shell_complete=complete_config_option,
-            click_type=ConfigOptionChoice(
-                [option.value for option in ConfigOption], case_sensitive=False
-            ),
-        ),
-    ] = None,
-    value: Annotated[
-        str,
-        typer.Argument(
-            help='Update given configuration option with this value', show_default=False
-        ),
-    ] = None,
-    system: Annotated[
-        bool,
-        typer.Option(
-            '--system/--local',
-            show_default=False,
-            help='interact with specific configuration',
-            show_envvar=False,
-        ),
-    ] = None,
-    unset: Annotated[
-        bool,
-        typer.Option('--unset', show_default=False, help='Remove configuration', show_envvar=False),
-    ] = None,
-    force: Annotated[
-        bool,
-        typer.Option(
-            '--force',
-            '-f',
-            show_default=False,
-            help='Delete configuration immediately (without confirmation)',
-            show_envvar=False,
-        ),
-    ] = False,
-):
-    "Interact with configuration."
-
-    # Convert string key to enum if provided
-    if key is not None:
-        key = ConfigOption(key.upper())
-
-    # Determine which configuration files to interact with
-    config_files = []
-    fp_closest_local_config = find_local_config()
-    if system is True:
-        config_files += [fp_config_default]
-    elif system is False:
-        if fp_closest_local_config:
-            config_files += [fp_closest_local_config]
-        else:
-            config_files += [pathlib.Path(filename)]
-    elif system is None:
-        if fp_closest_local_config:
-            config_files += [fp_closest_local_config]
-        config_files += [fp_config_default]
-
-    # We are working with individual configuration options
-    if key is not None:
-        if value is not None:
-            fp = config_files[0]
-            dotenv.set_key(fp, key, value)
-            return
-        if unset:
-            for fp in config_files:
-                if key in dotenv_values(fp):
-                    log.info('Unsetting %s from "%s"', key, fp)
-                    dotenv.unset_key(fp, key)
-                    return
-        else:
-            for fp in config_files:
-                if key in (final_config := dotenv_values(fp)):
-                    rich.print(final_config[key])
-                    return
-
-    # We are working with full configuration files
-    if key is None:
-        final_config = {}
-        for fp in config_files:
-            if fp.exists():
-                this_config = dotenv_values(fp)
-                if unset:
-                    if not force:
-                        rich.print_json(data=this_config)
-                    if force or typer.confirm(
-                        f'Do you want to delete configuration at "{link(fp)}"?'
-                    ):
-                        fp.unlink()
-                        typer.echo('Config reset.')
-                # keep precedence of local over system config
-                final_config = {**this_config, **final_config}
-        if not unset:
-            if final_config:
-                rich.print_json(data=final_config)
-            else:
-                log.warning('No configuration found.')
 
 
 def load_full_config(config_files: list[str | pathlib.Path] = None):

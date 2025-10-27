@@ -20,7 +20,7 @@ Feel free to provide PRs to support other configurations.
 
 ## Installation
 
-```console
+```sh
 pip install log-time-to-tempo
 ```
 
@@ -28,13 +28,13 @@ pip install log-time-to-tempo
 
 To initialize authentication and local caches of projects and issues, run
 
-```
+```sh
 lt init
 ```
 
 If you want to enable shell completion (which makes picking issues much easier), run
 
-```
+```sh
 lt --install-completion
 ```
 
@@ -60,15 +60,15 @@ lt logm MyProject:6,OPT:2
 ```sh
 # show logged time per issue
 lt stats
-# show logged time per issue for current month
-lt stats month
+# show logged time per issue for last week
+lt stats last_week
 # ..also show individual worklogs
 lt stats -v
 ```
 
 **Example**
 
-```
+```sh
 $ lt stats
 Period: month
  56h      vacation  ██▁█████▁▁▁▁▁▁▁▁▁
