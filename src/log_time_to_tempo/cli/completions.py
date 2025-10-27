@@ -1,6 +1,6 @@
 from click.shell_completion import CompletionItem
 
-from .. import _jira
+from .. import _jira, _time
 
 
 def complete_project(ctx, param: str, incomplete: str) -> list[str]:
@@ -20,3 +20,15 @@ def complete_issue(ctx, param: str, incomplete: str) -> list[CompletionItem]:
             client=_jira.MockClient(), no_update_cache=True
         ).items()
     ]
+
+
+def complete_date_range(ctx, param, incomplete) -> list[CompletionItem]:
+    return list(
+        CompletionItem(
+            v,
+            help=f'short: {", ".join(_time.relative_date_range_abbreviations.get(v))}'
+            if v in _time.relative_date_range_abbreviations
+            else '',
+        )
+        for v in _time.RelativeDateRange._value2member_map_.keys()
+    )
