@@ -158,7 +158,12 @@ def log_multi(
     message: Annotated[str, typer.Option('--message', '-m')] = None,
     yes: Annotated[bool, typer.Option('--yes', '-y', help='log time without confirmation')] = False,
 ):
-    "Log multiple time entries at once."
+    """Log multiple time entries at once.
+
+    Entries are specified as a comma-separated list of issue:duration pairs.
+
+    Example: lt logm opt:2h,project:5h30m,admin:30m
+    """
     if ctx.resilient_parsing:  # script is running for completion purposes
         return
 
