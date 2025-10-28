@@ -48,8 +48,8 @@ def alias(
     unset: Annotated[
         bool, typer.Option(help='unset a previously set alias', show_envvar=False)
     ] = False,
-    alias: Annotated[str, typer.Argument()] = None,
     issue: Annotated[str, typer.Argument(shell_complete=complete_issue_aliased)] = None,
+    alias: Annotated[str, typer.Argument()] = None,
 ):
     "Create an alias for an issue."
     if unset:
