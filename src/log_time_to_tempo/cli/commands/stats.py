@@ -16,33 +16,9 @@ from .._sparkline import (
 from ..completions import complete_date_range
 from ..utils import get_project_name
 
-# TODO: Combine `stats` and `list` commands into one command with a flag whether to aggregate projects
 
-
-@app.command('list', rich_help_panel='GET')
-def cmd_list(
-    ctx: typer.Context,
-    date_range: Annotated[
-        str,
-        typer.Argument(
-            callback=lambda x: _time.resolve_relative_date_range(x),
-            shell_complete=complete_date_range,
-        ),
-    ] = 'week',
-    from_date: Annotated[date, typer.Option('--from', parser=_time.parse_date)] = None,
-    to_date: Annotated[
-        date, typer.Option('--to', parser=_time.parse_date, show_default='today')
-    ] = datetime.now().date(),
-):
-    """List time entries.
-
-    For a custom time range, use the --from and --to options:
-
-    $ lt list --from 1.12 --to 24.12
-    """
-    if from_date is None:
-        from_date, to_date = _time.parse_relative_date_range(date_range)
-
+def _render_list_view(ctx, worklogs, from_date, to_date):
+    """Render individual time entries in a table."""
     table = Table(box=None)
     table.add_column('Date', style='cyan')
     table.add_column('Time', style='cyan')
@@ -53,7 +29,7 @@ def cmd_list(
 
     total_seconds = 0
     previous_worklog_date = None
-    for worklog in tempo.get_worklogs(ctx.obj.myself['key'], from_date, to_date):
+    for worklog in worklogs:
         table.add_row(
             worklog.started.strftime('%d.%m')
             if worklog.started.date() != previous_worklog_date
@@ -72,45 +48,10 @@ def cmd_list(
     )
 
 
-@app.command('stats', rich_help_panel='GET')
-def cmd_stats(
-    ctx: typer.Context,
-    date_range: Annotated[
-        str,
-        typer.Argument(
-            callback=lambda x: _time.resolve_relative_date_range(x),
-            shell_complete=complete_date_range,
-        ),
-    ] = 'month',
-    from_date: Annotated[Optional[date], typer.Option('--from', parser=_time.parse_date)] = None,
-    to_date: Annotated[
-        date, typer.Option('--to', parser=_time.parse_date, show_default='today')
-    ] = datetime.now().date(),
-    verbose: Annotated[int, typer.Option('-v', count=True)] = 0,
-    show_sparkline: Annotated[
-        bool,
-        typer.Option(
-            '--sparkline/--no-sparkline', is_flag=True, help='toggle sparkline visualization'
-        ),
-    ] = True,
-):
-    """Show logged time per project.
-
-    Projects are displayed with total time spent and optionally a
-    sparkline visualization showing daily time patterns over the
-    selected period.
-
-    For a custom time range, use the --from and --to options:
-
-    $ lt stats --from 1.12 --to 24.12
-    """
+def _render_stats_view(ctx, worklogs, from_date, to_date, date_range, verbose, show_sparkline):
+    """Render aggregated statistics per project."""
     if from_date is None:
         typer.secho(f'Period: {date_range.value}', bold=True)
-        try:
-            from_date, to_date = _time.parse_relative_date_range(date_range)
-        except ValueError:
-            typer.secho(f'Invalid date range: {date_range}', fg='red')
-            exit(1)
     else:
         typer.secho(
             f'Period: {str(from_date) + (f" - {to_date}" if to_date != from_date else "")}',
@@ -118,7 +59,7 @@ def cmd_stats(
         )
 
     stats = {}
-    for worklog in tempo.get_worklogs(ctx.obj.myself['key'], from_date, to_date):
+    for worklog in worklogs:
         project = get_project_name(ctx, worklog.issue)
         if project not in stats:
             stats[project] = {
@@ -142,10 +83,9 @@ def cmd_stats(
 
     MAX_COL_WIDTH = 20
     col_width = min(max((len(p) for p in stats), default=0), MAX_COL_WIDTH)
-    if col_width < 5:  # ensure that 'Total' on last line fits as well
+    if col_width < 5:
         col_width = 5
 
-    # Determine date range type and generate axis labels if sparkline is shown
     axis_labels = ''
     if show_sparkline and stats:
         range_type = determine_date_range_type(from_date, to_date)
@@ -161,7 +101,6 @@ def cmd_stats(
                 stats[project]['days'], from_date, to_date, maximum=8, minimum=0
             )
 
-            # Limit project name width, so that sparkline fits next to it
             if len(project) > col_width:
                 project_str = project[: col_width - 2] + '..'
             else:
@@ -196,3 +135,91 @@ def cmd_stats(
         )
     else:
         typer.secho(f'{total_duration}  Total', bold=True)
+
+
+@app.command('list', rich_help_panel='GET')
+def cmd_list(
+    ctx: typer.Context,
+    date_range: Annotated[
+        str,
+        typer.Argument(
+            callback=lambda x: _time.resolve_relative_date_range(x),
+            shell_complete=complete_date_range,
+        ),
+    ] = 'week',
+    from_date: Annotated[date, typer.Option('--from', parser=_time.parse_date)] = None,
+    to_date: Annotated[
+        date, typer.Option('--to', parser=_time.parse_date, show_default='today')
+    ] = datetime.now().date(),
+    aggregate: Annotated[
+        bool,
+        typer.Option('--aggregate', '-a', help='Aggregate by project (stats view)'),
+    ] = False,
+    verbose: Annotated[int, typer.Option('-v', count=True)] = 0,
+    show_sparkline: Annotated[
+        bool,
+        typer.Option(
+            '--sparkline/--no-sparkline', is_flag=True, help='Toggle sparkline visualization (stats view only)'
+        ),
+    ] = True,
+):
+    """List time entries.
+
+    For a custom time range, use the --from and --to options:
+
+    $ lt list --from 1.12 --to 24.12
+
+    Use --aggregate to show aggregated statistics per project instead.
+    """
+    if from_date is None:
+        from_date, to_date = _time.parse_relative_date_range(date_range)
+
+    worklogs = list(tempo.get_worklogs(ctx.obj.myself['key'], from_date, to_date))
+
+    if aggregate:
+        _render_stats_view(ctx, worklogs, from_date, to_date, date_range, verbose, show_sparkline)
+    else:
+        _render_list_view(ctx, worklogs, from_date, to_date)
+
+
+@app.command('stats', rich_help_panel='GET')
+def cmd_stats(
+    ctx: typer.Context,
+    date_range: Annotated[
+        str,
+        typer.Argument(
+            callback=lambda x: _time.resolve_relative_date_range(x),
+            shell_complete=complete_date_range,
+        ),
+    ] = 'month',
+    from_date: Annotated[Optional[date], typer.Option('--from', parser=_time.parse_date)] = None,
+    to_date: Annotated[
+        date, typer.Option('--to', parser=_time.parse_date, show_default='today')
+    ] = datetime.now().date(),
+    verbose: Annotated[int, typer.Option('-v', count=True)] = 0,
+    show_sparkline: Annotated[
+        bool,
+        typer.Option(
+            '--sparkline/--no-sparkline', is_flag=True, help='Toggle sparkline visualization'
+        ),
+    ] = True,
+):
+    """Show logged time per project.
+
+    Projects are displayed with total time spent and optionally a
+    sparkline visualization showing daily time patterns over the
+    selected period.
+
+    For a custom time range, use the --from and --to options:
+
+    $ lt stats --from 1.12 --to 24.12
+    """
+    if from_date is None:
+        try:
+            from_date, to_date = _time.parse_relative_date_range(date_range)
+        except ValueError:
+            typer.secho(f'Invalid date range: {date_range}', fg='red')
+            exit(1)
+
+    worklogs = list(tempo.get_worklogs(ctx.obj.myself['key'], from_date, to_date))
+    _render_stats_view(ctx, worklogs, from_date, to_date, date_range, verbose, show_sparkline)
