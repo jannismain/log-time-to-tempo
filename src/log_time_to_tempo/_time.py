@@ -22,6 +22,8 @@ def parse_duration_combined(s: str) -> timedelta:
     """Parse a duration string into a timedelta object."""
     pattern = r'(?:(\d+)h)?\s?(?:(\d+)m)?'  # https://regexr.com/7sem2
     match = re.match(pattern, s)
+    if not match:
+        raise ValueError(f'Invalid duration format: {s}')
     hours, minutes = match.groups(default='0')
     return timedelta(hours=int(hours), minutes=int(minutes))
 
@@ -56,8 +58,10 @@ def parse_date(value: str | date) -> date:
     else:
         try:
             return parse_past_weekday_relative(value)
-        except ValueError:
-            return dateparser.parse(value).date()
+        except ValueError as e:
+            if parsed := dateparser.parse(value):
+                return parsed.date()
+            raise ValueError(f'Unknown date format: {value}') from e
 
 
 def parse_date_dot(value: str) -> date:
@@ -95,7 +99,7 @@ def parse_past_weekday_relative(value: str) -> date:
         return date.today() - timedelta(days=date.today().weekday() - day)
 
 
-def last_monday(day: date = None) -> date:
+def last_monday(day: date | None = None) -> date:
     if day is None:
         day = date.today()
     # Monday is 0 and Sunday is 6
@@ -158,7 +162,7 @@ class RelativeDateRange(str, Enum):
     LAST_YEAR = 'last_year'
 
 
-relative_date_range_abbreviations = {
+relative_date_range_abbreviations: dict[RelativeDateRange, set[str]] = {
     RelativeDateRange.TODAY: {'day', 'd'},
     RelativeDateRange.LAST_SEVEN_DAYS: {'l7'},
     RelativeDateRange.WEEK: {'w'},

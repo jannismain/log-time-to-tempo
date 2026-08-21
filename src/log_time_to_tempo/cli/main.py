@@ -22,7 +22,7 @@ arg_relative_date_range = typer.Argument(
     shell_complete=lambda ctx, param, incomplete: list(
         CompletionItem(
             v,
-            help=f'short: {", ".join(_time.relative_date_range_abbreviations.get(v))}'
+            help=f'short: {", ".join(_time.relative_date_range_abbreviations[v])}'
             if v in _time.relative_date_range_abbreviations
             else '',
         )
